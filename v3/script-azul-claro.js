@@ -469,13 +469,13 @@ function renderRetirementResult() {
     validAge ? (age > 40 ? "Entre más tarde empiezas, más vale la constancia." : "") : "Usa una edad entre 18 y 60 años.",
     validAge ? "warn" : "error"
   );
-  setHelp(contributionHelp, validContribution ? "" : "La aportación mínima de referencia es $2,000 mensuales.", "error");
+  setHelp(contributionHelp, validContribution ? "" : "El ahorro mínimo de referencia es $2,000 mensuales.", "error");
 
   if (!validAge || !validContribution) {
     result.innerHTML = `
       <div class="empty-result">
         <div>
-          <strong>Ingresa tu edad y aportación para ver el escenario.</strong>
+          <strong>Ingresa tu edad y ahorro mensual para ver el escenario.</strong>
           <p>Con esos dos datos la calculadora muestra cuánto podrías tener a los 65.</p>
         </div>
       </div>
@@ -551,7 +551,7 @@ function renderRetirementResult() {
 
       <div class="statement-ledger" aria-label="Resumen del cálculo">
         <div>
-          <span>Lo que aportarías</span>
+          <span>Lo que ahorrarías</span>
           <strong>${formatMoney(totalContributed)}</strong>
         </div>
         <div>
@@ -576,7 +576,7 @@ function renderRetirementResult() {
       </div>
 
       <p class="statement-disclaimer">
-        Estimación proyectada en pesos mexicanos (MXN), con rendimiento neto compuesto (10.52% anual) e incremento anual de aportación. La renta vitalicia privada garantiza tu pago mensual de por vida —incluso si superas los 100 años de edad. Esta es la estrategia patrimonial diseñada para dueños de negocio, emprendedores y profesionistas que quieren retirarse a los 65 sin tener que trabajar por obligación el resto de su vida.
+        Estimación proyectada en pesos mexicanos (MXN), con rendimiento neto compuesto (10.52% anual) e incremento anual del ahorro mensual. La renta vitalicia privada garantiza tu pago mensual de por vida —incluso si superas los 100 años de edad. Esta es la estrategia patrimonial diseñada para dueños de negocio, emprendedores y profesionistas que quieren retirarse a los 65 sin tener que trabajar por obligación el resto de su vida.
       </p>
     </article>
   `;
