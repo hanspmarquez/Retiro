@@ -107,7 +107,6 @@ function setupCalendlyModal() {
 
   const getEmbedUrl = (url) => {
     const embedUrl = new URL(url);
-    embedUrl.searchParams.set("hide_event_type_details", "1");
     embedUrl.searchParams.set("hide_gdpr_banner", "1");
     embedUrl.searchParams.set("primary_color", "047857");
     embedUrl.searchParams.set("text_color", "082f49");
