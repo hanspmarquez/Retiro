@@ -727,6 +727,124 @@
         font-weight: 900 !important;
       }
 
+      body.theme-blue-light.calendly-open {
+        overflow: hidden;
+      }
+
+      body.theme-blue-light .calendly-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.24s ease;
+      }
+
+      body.theme-blue-light .calendly-modal.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      body.theme-blue-light .calendly-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(8, 47, 73, 0.54);
+        backdrop-filter: blur(10px);
+      }
+
+      body.theme-blue-light .calendly-dialog {
+        position: relative;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        width: min(100%, 980px);
+        height: min(88vh, 760px);
+        overflow: hidden;
+        border: 1px solid rgba(11, 111, 179, 0.22);
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 30px 90px rgba(8, 47, 73, 0.32);
+      }
+
+      body.theme-blue-light .calendly-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 18px 14px 22px;
+        border-bottom: 1px solid #d7eefa;
+        background: linear-gradient(135deg, #f5fbff, #ffffff);
+      }
+
+      body.theme-blue-light .calendly-header p {
+        margin: 0 0 4px;
+        color: #047857 !important;
+        font-size: 0.76rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      body.theme-blue-light .calendly-header h2 {
+        margin: 0;
+        color: #082f49 !important;
+        font-size: clamp(1.1rem, 3vw, 1.55rem);
+        line-height: 1.1;
+      }
+
+      body.theme-blue-light .calendly-close {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        place-items: center;
+        border: 0;
+        border-radius: 999px;
+        background: #eaf6ff;
+        color: #075985;
+        cursor: pointer;
+        font-size: 1.55rem;
+        line-height: 1;
+      }
+
+      body.theme-blue-light .calendly-close:hover,
+      body.theme-blue-light .calendly-close:focus-visible {
+        background: #d7efff;
+        outline: 2px solid rgba(11, 111, 179, 0.28);
+        outline-offset: 2px;
+      }
+
+      body.theme-blue-light .calendly-frame {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: #ffffff;
+      }
+
+      @media (max-width: 640px) {
+        body.theme-blue-light .calendly-modal {
+          padding: 10px;
+        }
+
+        body.theme-blue-light .calendly-dialog {
+          width: 100%;
+          height: 92vh;
+          border-radius: 14px;
+        }
+
+        body.theme-blue-light .calendly-header {
+          padding: 14px 12px 12px 16px;
+        }
+
+        body.theme-blue-light .calendly-close {
+          width: 38px;
+          height: 38px;
+          flex-basis: 38px;
+        }
+      }
+
       body.theme-blue-light .hero-rule span {
         display: none !important;
       }
@@ -1314,7 +1432,7 @@
           </p>
           <div class="hero-actions">
             <a class="btn btn-primary btn-large" href="#calculadora">Calcular mi retiro</a>
-            <a class="btn btn-ghost btn-large" href="https://calendly.com/hanspmz-dev/45min" target="_blank" rel="noopener noreferrer">
+            <a class="btn btn-ghost btn-large calendly-trigger" href="https://calendly.com/hanspmz-dev/45min" data-calendly-trigger>
               Agenda tu asesoría de retiro
             </a>
           </div>
@@ -1543,7 +1661,7 @@
             <p>
               Trabajo con soluciones de Allianz — la aseguradora con mayor valor de marca en el mundo — porque creo que el respaldo institucional importa tanto como la estrategia.
             </p>
-            <a class="btn btn-primary btn-large" href="https://calendly.com/hanspmz-dev/45min" target="_blank" rel="noopener noreferrer">
+            <a class="btn btn-primary btn-large calendly-trigger" href="https://calendly.com/hanspmz-dev/45min" data-calendly-trigger>
               Agenda tu asesoría para iniciar tu plan de retiro
             </a>
           </div>
@@ -1552,7 +1670,21 @@
 
     </main>
 
-    <script src="script-azul-claro.js?v=3" defer></script>
+    <div class="calendly-modal" id="calendly-modal" aria-hidden="true">
+      <div class="calendly-backdrop" data-calendly-close></div>
+      <section class="calendly-dialog" role="dialog" aria-modal="true" aria-labelledby="calendly-title">
+        <header class="calendly-header">
+          <div>
+            <p>Agenda en línea</p>
+            <h2 id="calendly-title">Agenda tu asesoría de retiro</h2>
+          </div>
+          <button class="calendly-close" type="button" data-calendly-close aria-label="Cerrar agenda">×</button>
+        </header>
+        <iframe class="calendly-frame" id="calendly-frame" title="Agenda de asesoría con Hans P Marquez" src="about:blank" loading="lazy"></iframe>
+      </section>
+    </div>
+
+    <script src="script-azul-claro.js?v=4" defer></script>
     <script>
       (function () {
         document.body.classList.add("landing-enter");

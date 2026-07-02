@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTilt();
   renderNotes();
   setupCalculator();
+  setupCalendlyModal();
 });
 
 // ── Reveal on scroll ───────────────────────────────────────────────────────
@@ -93,6 +94,63 @@ function setupReveal() {
   );
 
   items.forEach((item) => observer.observe(item));
+}
+
+function setupCalendlyModal() {
+  const modal = document.querySelector("#calendly-modal");
+  const frame = document.querySelector("#calendly-frame");
+  const triggers = document.querySelectorAll("[data-calendly-trigger]");
+  const closeControls = document.querySelectorAll("[data-calendly-close]");
+  if (!modal || !frame || !triggers.length) return;
+
+  let lastFocusedElement = null;
+
+  const getEmbedUrl = (url) => {
+    const embedUrl = new URL(url);
+    embedUrl.searchParams.set("hide_event_type_details", "1");
+    embedUrl.searchParams.set("hide_gdpr_banner", "1");
+    embedUrl.searchParams.set("primary_color", "047857");
+    embedUrl.searchParams.set("text_color", "082f49");
+    return embedUrl.toString();
+  };
+
+  const openModal = (url, opener) => {
+    lastFocusedElement = opener || document.activeElement;
+    frame.src = getEmbedUrl(url || SCHEDULE_URL);
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("calendly-open");
+    window.setTimeout(() => {
+      modal.querySelector("[data-calendly-close]")?.focus();
+    }, 80);
+  };
+
+  const closeModal = () => {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("calendly-open");
+    frame.src = "about:blank";
+    if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+      lastFocusedElement.focus();
+    }
+  };
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      openModal(trigger.href, trigger);
+    });
+  });
+
+  closeControls.forEach((control) => {
+    control.addEventListener("click", closeModal);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) {
+      closeModal();
+    }
+  });
 }
 
 // ── Call experience (no-op in landing) ────────────────────────────────────
