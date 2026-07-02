@@ -1,4 +1,4 @@
-# Hans P Marquez | Patrimonio y retiro
+# Hans P Márquez | Patrimonio y retiro
 
 Sitio web para presentar una experiencia inicial de llamada y una landing de Plan Personal de Retiro con Allianz.
 
@@ -18,4 +18,3 @@ Después abre:
 ```text
 http://localhost:8000/v3/intro.html
 ```
-
