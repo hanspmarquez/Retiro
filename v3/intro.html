@@ -464,6 +464,31 @@
           audio.dataset.mode = "voice";
         };
 
+        const resetIncomingExperience = () => {
+          if (timerFrame) cancelAnimationFrame(timerFrame);
+          timerFrame = null;
+          if (questionTimeout) clearTimeout(questionTimeout);
+          questionTimeout = null;
+          stopVibration();
+          stopIncomingSound();
+          stopEndedTone();
+          audio.pause();
+          audio.src = voiceAudioSrc;
+          audio.load();
+          audio.dataset.mode = "voice";
+          audio.playbackRate = audioPlaybackRate;
+          audio.currentTime = 0;
+          progress.style.strokeDashoffset = ringLength;
+          timer.textContent = "00:00";
+          screen.dataset.state = "incoming";
+          delete screen.dataset.sound;
+          answerButton.disabled = true;
+          incomingSoundHasPlayed = false;
+          callHasFinished = false;
+          soundGate?.classList.remove("is-hidden");
+          answerOptions.forEach((option) => option.classList.remove("is-selected"));
+        };
+
         const startIncomingSound = async () => {
           if (!ringAudio || screen.dataset.state !== "incoming" || ringStopTimeout || incomingSoundHasPlayed) return;
           ringAudio.volume = 0.78;
@@ -595,6 +620,30 @@
             // Give a moment for the selection animation, then redirect
             setTimeout(() => goToLanding(btn.dataset.answer), 480);
           });
+        });
+
+        const handlePageInterruption = () => {
+          if (screen.dataset.state === "question") return;
+          resetIncomingExperience();
+        };
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") {
+            handlePageInterruption();
+          }
+        });
+
+        window.addEventListener("pagehide", handlePageInterruption);
+        window.addEventListener("blur", () => {
+          if (screen.dataset.state === "active" || screen.dataset.state === "ended") {
+            handlePageInterruption();
+          }
+        });
+
+        window.addEventListener("pageshow", (event) => {
+          if (event.persisted && screen.dataset.state !== "question") {
+            resetIncomingExperience();
+          }
         });
 
         window.addEventListener("beforeunload", () => {
