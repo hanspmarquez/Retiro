@@ -400,6 +400,7 @@
         const voiceEndCutSeconds = 1;
         const endedToneSeconds = 2;
         const progressMidpointAt = 0.3;
+        const progressStorageKey = "retiro_call_voice_progress_seconds";
         const ringLength = 2 * Math.PI * 74;
         let timerFrame = null;
         let vibrationLoop = null;
@@ -433,6 +434,36 @@
           }
 
           return 0.5 + ((ratio - progressMidpointAt) / (1 - progressMidpointAt)) * 0.5;
+        };
+
+        const getSavedVoiceProgress = () => {
+          try {
+            const saved = Number(localStorage.getItem(progressStorageKey));
+            if (!Number.isFinite(saved)) return audioSkipSeconds;
+            return Math.max(audioSkipSeconds, saved);
+          } catch {
+            return audioSkipSeconds;
+          }
+        };
+
+        const saveVoiceProgress = () => {
+          if (audio.dataset.mode === "ended-tone" || screen.dataset.state !== "active") return;
+          try {
+            localStorage.setItem(progressStorageKey, String(Math.max(audioSkipSeconds, audio.currentTime)));
+          } catch (_) {}
+        };
+
+        const clearVoiceProgress = () => {
+          try {
+            localStorage.removeItem(progressStorageKey);
+          } catch (_) {}
+        };
+
+        const hasSavedVoiceProgress = () => getSavedVoiceProgress() > audioSkipSeconds + 0.75;
+
+        const updateSoundGateCopy = () => {
+          if (!soundGateButton) return;
+          soundGateButton.textContent = hasSavedVoiceProgress() ? "Tocar para continuar" : "Tocar para iniciar";
         };
 
         const vibrateIncoming = () => {
@@ -477,14 +508,14 @@
           audio.load();
           audio.dataset.mode = "voice";
           audio.playbackRate = audioPlaybackRate;
-          audio.currentTime = 0;
           progress.style.strokeDashoffset = ringLength;
-          timer.textContent = "00:00";
+          timer.textContent = formatTime(Math.max(0, getSavedVoiceProgress() - audioSkipSeconds) / audioPlaybackRate);
           screen.dataset.state = "incoming";
           delete screen.dataset.sound;
           answerButton.disabled = true;
           incomingSoundHasPlayed = false;
           callHasFinished = false;
+          updateSoundGateCopy();
           soundGate?.classList.remove("is-hidden");
           answerOptions.forEach((option) => option.classList.remove("is-selected"));
         };
@@ -543,6 +574,7 @@
           const visualRatio = getVisualProgress(ratio);
           timer.textContent = formatTime(elapsed / audioPlaybackRate);
           progress.style.strokeDashoffset = ringLength * (1 - visualRatio);
+          saveVoiceProgress();
 
           if (Number.isFinite(audio.duration) && audio.currentTime >= audio.duration - voiceEndCutSeconds) {
             finishCall();
@@ -566,6 +598,7 @@
           stopVibration();
           stopIncomingSound();
           audio.pause();
+          clearVoiceProgress();
           progress.style.strokeDashoffset = 0;
           screen.dataset.state = "ended";
           playEndedToneBeforeQuestion();
@@ -583,7 +616,12 @@
           }
           audio.playbackRate = audioPlaybackRate;
           try {
-            audio.currentTime = audioSkipSeconds;
+            const resumeTime = getSavedVoiceProgress();
+            const latestSafeTime =
+              Number.isFinite(audio.duration) && audio.duration > voiceEndCutSeconds
+                ? Math.max(audioSkipSeconds, audio.duration - voiceEndCutSeconds - 0.5)
+                : resumeTime;
+            audio.currentTime = Math.min(resumeTime, latestSafeTime);
             await audio.play();
           } catch {
             finishCall();
@@ -610,13 +648,16 @@
         answerButton.addEventListener("click", answerCall);
         audio.addEventListener("ended", finishCall);
         audio.addEventListener("loadedmetadata", () => {
-          timer.textContent = "00:00";
+          if (screen.dataset.state === "incoming") {
+            timer.textContent = formatTime(Math.max(0, getSavedVoiceProgress() - audioSkipSeconds) / audioPlaybackRate);
+          }
         });
 
         answerOptions.forEach((btn) => {
           btn.addEventListener("click", () => {
             answerOptions.forEach((o) => o.classList.remove("is-selected"));
             btn.classList.add("is-selected");
+            clearVoiceProgress();
             // Give a moment for the selection animation, then redirect
             setTimeout(() => goToLanding(btn.dataset.answer), 480);
           });
@@ -624,6 +665,7 @@
 
         const handlePageInterruption = () => {
           if (screen.dataset.state === "question") return;
+          saveVoiceProgress();
           resetIncomingExperience();
         };
 
@@ -647,6 +689,7 @@
         });
 
         window.addEventListener("beforeunload", () => {
+          saveVoiceProgress();
           stopVibration();
           stopIncomingSound();
           stopEndedTone();
@@ -655,6 +698,8 @@
         });
 
         // ── Start ──────────────────────────────────────────
+        updateSoundGateCopy();
+        timer.textContent = formatTime(Math.max(0, getSavedVoiceProgress() - audioSkipSeconds) / audioPlaybackRate);
         document.addEventListener("keydown", unlockIncomingExperience, { once: true });
       })();
     </script>
