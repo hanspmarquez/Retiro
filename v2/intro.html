@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Plan de retiro personalizado · Allianz" />
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" href="../assets/call-background.png" as="image" />
+    <link rel="preload" href="../assets/call-advisor.png" as="image" />
+    <link rel="preload" href="../assets/call-audio.m4a" as="audio" />
+    <link rel="stylesheet" href="../styles.css" />
+    <title>Llamada entrante · Plan de Retiro</title>
+    <style>
+      /* ── Intro-only overrides ───────────────────────────── */
+      body {
+        margin: 0;
+        overflow: hidden; /* no scroll while in call screen */
+      }
+
+      /* Hide the site-header & main that don't exist here */
+      .experience-shell {
+        min-height: 100svh;
+      }
+
+      /* Transition overlay that fires when navigating away */
+      #exit-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #06120e;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      #exit-overlay.is-fading {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body class="theme-green proposal-vault proposal-cinema">
+    <!-- Full-screen fade used when navigating to the landing page -->
+    <div id="exit-overlay" aria-hidden="true"></div>
+
+    <section class="experience-shell" id="experiencia" aria-label="Experiencia inicial">
+      <div class="call-screen" data-state="incoming" aria-live="polite">
+        <img class="call-backdrop" src="../assets/call-background.png" alt="" />
+        <div class="call-shade call-shade-top"></div>
+        <div class="call-shade call-shade-bottom"></div>
+        <div class="call-vignette"></div>
+
+        <header class="call-brand-row">
+          <span class="call-brand-line"></span>
+          <span>Retiro con estrategia</span>
+        </header>
+
+        <span class="call-corner call-corner-tl"></span>
+        <span class="call-corner call-corner-tr"></span>
+        <span class="call-corner call-corner-bl"></span>
+        <span class="call-corner call-corner-br"></span>
+
+        <div class="call-content">
+          <div class="caller-stack">
+            <div class="avatar-stage">
+              <div class="ring-waves" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+
+              <svg class="progress-ring" viewBox="0 0 160 160" aria-hidden="true">
+                <circle class="progress-base" cx="80" cy="80" r="74"></circle>
+                <circle class="progress-value" cx="80" cy="80" r="74"></circle>
+              </svg>
+
+              <div class="avatar-wrap">
+                <img src="../assets/call-advisor.png" alt="Asesor de retiro" />
+              </div>
+            </div>
+
+            <div class="caller-copy">
+              <h1>Asesor de retiro</h1>
+              <p class="caller-name">Llamada privada</p>
+            </div>
+
+            <div class="status-area">
+              <p class="status-text status-incoming">llamada entrante...</p>
+              <div class="status-active">
+                <span class="timer">00:00</span>
+                <div class="waveform" aria-hidden="true"></div>
+              </div>
+              <p class="status-text status-ended">llamada finalizada</p>
+            </div>
+          </div>
+
+          <button class="answer-button" id="answer-button" type="button" aria-label="Contestar llamada">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.92.35 1.82.7 2.69a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.39-1.27a2 2 0 0 1 2.11-.45c.87.35 1.77.58 2.69.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <section class="question-screen" aria-labelledby="question-title">
+          <div class="question-inner">
+            <p class="question-kicker">Antes de continuar</p>
+            <h2 id="question-title">¿Alguna vez has calculado cuánto dinero podrías recibir cuando llegue tu retiro?</h2>
+            <div class="answers" role="group" aria-label="Opciones de respuesta">
+              <button type="button" data-answer="si">Sí</button>
+              <button type="button" data-answer="mas-o-menos">Más o menos</button>
+              <button type="button" data-answer="nunca">Nunca lo he calculado</button>
+            </div>
+          </div>
+        </section>
+
+        <audio class="call-audio" src="../assets/call-audio.m4a" preload="auto"></audio>
+      </div>
+    </section>
+
+    <script>
+      /* ── Minimal inline JS ─────────────────────────────────
+         Only the call-experience logic; no calculator, no notes.
+         Redirects to index.html after the question is answered.
+      ─────────────────────────────────────────────────────── */
+
+      (function () {
+        "use strict";
+
+        // Mark JS available
+        document.documentElement.classList.add("js");
+
+        const LANDING_URL = "index.html";
+
+        const screen = document.querySelector(".call-screen");
+        const audio = document.querySelector(".call-audio");
+        const answerButton = document.querySelector("#answer-button");
+        const timer = document.querySelector(".timer");
+        const progress = document.querySelector(".progress-value");
+        const waveform = document.querySelector(".waveform");
+        const answerOptions = document.querySelectorAll(".answers button");
+        const exitOverlay = document.querySelector("#exit-overlay");
+
+        if (!screen || !audio || !answerButton || !timer || !progress || !waveform) return;
+
+        // ── Constants ──────────────────────────────────────
+        const audioSkipSeconds = 2;
+        const audioPlaybackRate = 1.2;
+        const ringLength = 2 * Math.PI * 74;
+        let timerFrame = null;
+        let vibrationLoop = null;
+        let questionTimeout = null;
+
+        // ── Ring ───────────────────────────────────────────
+        progress.style.strokeDasharray = ringLength;
+        progress.style.strokeDashoffset = ringLength;
+
+        // ── Waveform bars ──────────────────────────────────
+        if (!waveform.children.length) {
+          for (let i = 0; i < 20; i++) {
+            const bar = document.createElement("span");
+            bar.style.animationDelay = `${(i % 6) * 0.07}s`;
+            waveform.appendChild(bar);
+          }
+        }
+
+        // ── Helpers ────────────────────────────────────────
+        const formatTime = (s) => {
+          const safe = Math.max(0, Math.floor(s || 0));
+          return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+        };
+
+        const vibrateIncoming = () => {
+          if (!("vibrate" in navigator)) return;
+          navigator.vibrate([420, 120, 420]);
+          vibrationLoop = setInterval(() => navigator.vibrate([420, 120, 420]), 1700);
+        };
+
+        const stopVibration = () => {
+          if (vibrationLoop) clearInterval(vibrationLoop);
+          vibrationLoop = null;
+          if ("vibrate" in navigator) navigator.vibrate(0);
+        };
+
+        const updateProgress = () => {
+          const sourceDuration =
+            Number.isFinite(audio.duration) && audio.duration > audioSkipSeconds
+              ? audio.duration - audioSkipSeconds
+              : 53;
+          const elapsed = Math.max(0, audio.currentTime - audioSkipSeconds);
+          const ratio = Math.min(elapsed / sourceDuration, 1);
+          timer.textContent = formatTime(elapsed / audioPlaybackRate);
+          progress.style.strokeDashoffset = ringLength * (1 - ratio);
+          if (screen.dataset.state === "active") {
+            timerFrame = requestAnimationFrame(updateProgress);
+          }
+        };
+
+        const showQuestion = () => {
+          screen.dataset.state = "question";
+        };
+
+        const finishCall = () => {
+          if (timerFrame) cancelAnimationFrame(timerFrame);
+          timerFrame = null;
+          stopVibration();
+          progress.style.strokeDashoffset = 0;
+          screen.dataset.state = "ended";
+          questionTimeout = setTimeout(showQuestion, 1100);
+        };
+
+        const answerCall = async () => {
+          if (screen.dataset.state !== "incoming") return;
+          stopVibration();
+          screen.dataset.state = "active";
+          audio.playbackRate = audioPlaybackRate;
+          try {
+            audio.currentTime = audioSkipSeconds;
+            await audio.play();
+          } catch {
+            finishCall();
+            return;
+          }
+          updateProgress();
+        };
+
+        // ── Navigate to landing ────────────────────────────
+        const goToLanding = (answer) => {
+          try {
+            localStorage.setItem("retiro_calculo_respuesta", answer || "");
+          } catch (_) {}
+
+          // Fade out then redirect
+          exitOverlay.classList.add("is-fading");
+          setTimeout(() => {
+            window.location.href = LANDING_URL;
+          }, 580);
+        };
+
+        // ── Events ─────────────────────────────────────────
+        answerButton.addEventListener("click", answerCall);
+        audio.addEventListener("ended", finishCall);
+        audio.addEventListener("loadedmetadata", () => {
+          timer.textContent = "00:00";
+        });
+
+        answerOptions.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            answerOptions.forEach((o) => o.classList.remove("is-selected"));
+            btn.classList.add("is-selected");
+            // Give a moment for the selection animation, then redirect
+            setTimeout(() => goToLanding(btn.dataset.answer), 480);
+          });
+        });
+
+        window.addEventListener("beforeunload", () => {
+          stopVibration();
+          if (timerFrame) cancelAnimationFrame(timerFrame);
+          if (questionTimeout) clearTimeout(questionTimeout);
+        });
+
+        // ── Start ──────────────────────────────────────────
+        vibrateIncoming();
+      })();
+    </script>
+  </body>
+</html>

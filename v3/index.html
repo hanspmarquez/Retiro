@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Calcula cuánto podrías tener al retirarte, compara con el AFORE y estima tu pensión mensual. Plan Personal de Retiro con Allianz desde $2,000 al mes."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <title>Plan de Retiro · Allianz · Hans P Marquez</title>
+    <style>
+      /* ─── Tipografía ──────────────────────────────────── */
+      :root,
+      .theme-green {
+        --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+        --font-display: "Cormorant Garamond", Georgia, serif;
+      }
+      /* ─── Propuesta "Ultra Azul Profundo & Verde Dinero" ────────── */
+      :root, .theme-green {
+        --paper: #001633; /* Fondo global en azul marino noche */
+        --surface: #00224f;
+        --surface-soft: #002b66;
+        --ink: #f0f6ff; /* Textos en blanco hielo luminoso */
+        --muted: #94b8e0; /* Subtextos visibles sobre azul */
+        --line: rgba(148, 184, 224, 0.2);
+        --brand: #10b981; /* Verde Dinero Esmeralda Brillante */
+        --brand-blue: #003781;
+      }
+
+      body { background-color: #001633 !important; color: #f0f6ff !important; }
+
+      /* Todas las secciones en azul profundo con alta legibilidad */
+      section, .intro-section, .calculator-section, .compare-section, .notes-section, .advisor-section {
+        background-color: #001633 !important;
+        color: #f0f6ff !important;
+      }
+      p.lead, .scenario-sub, .scenario-note, .statement-disclaimer, .compare-note { color: #94b8e0 !important; }
+
+      /* Hero Superior */
+      .hero-text {
+        background: radial-gradient(circle at 50% 0%, #003781 0%, #001633 85%) !important;
+        color: #ffffff !important;
+      }
+      .hero-rule .eyebrow, .eyebrow { color: #60a5fa !important; font-weight: 800 !important; }
+      .hero-rule span { background: rgba(96, 165, 250, 0.4) !important; }
+      .hero-pill {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      }
+
+      /* Botones Principales resplandecientes en Verde Dinero */
+      .btn-primary, .hero-text .btn-primary {
+        background: #10b981 !important;
+        border-color: #10b981 !important;
+        color: #001633 !important;
+        font-weight: 800 !important;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35) !important;
+      }
+      .btn-primary:hover, .hero-text .btn-primary:hover {
+        background: #059669 !important;
+        border-color: #059669 !important;
+        color: #ffffff !important;
+        box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5) !important;
+      }
+
+      /* Ticker intermedio */
+      .motion-strip {
+        background: #000f24 !important;
+        color: #60a5fa !important;
+        border-block: 1px solid rgba(96, 165, 250, 0.25) !important;
+      }
+      .motion-strip span { color: #ffffff !important; font-weight: 700; }
+
+      /* Tarjetas de La Idea en Simple y Notas */
+      .value-grid article, .note-item, .flex-card, .advisor-card, .proposal-vault {
+        background: #00224f !important;
+        border: 1px solid rgba(148, 184, 224, 0.25) !important;
+        color: #f0f6ff !important;
+      }
+      .value-grid article span { color: #60a5fa !important; font-weight: 800; }
+      .value-grid article h3, .note-item h3, .flex-card h3, .advisor-card h2 { color: #ffffff !important; }
+      .value-grid article:hover { border-color: #10b981 !important; box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15) !important; }
+
+      /* Calculadora / Escenarios */
+      .scenario-tag-ppr { background: #10b981 !important; color: #001633 !important; font-weight: 800 !important; }
+      .scenario-block-ppr .scenario-capital-num,
+      .scenario-block-ppr .scenario-pension-num { color: #10b981 !important; }
+      .scenario-block-ppr { background: #002b66 !important; border-color: rgba(16, 185, 129, 0.4) !important; }
+      .scenario-diff {
+        background: rgba(16, 185, 129, 0.15) !important;
+        border: 1px solid rgba(16, 185, 129, 0.35) !important;
+      }
+      .scenario-diff span { color: #f0f6ff !important; }
+      .scenario-diff strong { color: #10b981 !important; font-weight: 800; }
+
+      .scenario-block-afore { background: #001e47 !important; color: #cbdde0 !important; }
+      .scenario-capital-afore, .scenario-pension-afore { color: #94b8e0 !important; }
+      .scenario-tag-afore { background: rgba(255, 255, 255, 0.1) !important; color: #cbdde0 !important; border-color: rgba(255, 255, 255, 0.2) !important; }
+
+      /* Gráfica Financiera: Crecimiento en Verde Dinero Vibrante */
+      .chart-line-main { stroke: #10b981 !important; stroke-width: 3.5px !important; }
+      .chart-area      { fill: rgba(16, 185, 129, 0.22) !important; }
+      .chart-endpoint  { fill: #10b981 !important; stroke: #ffffff !important; stroke-width: 2px !important; }
+      .chart-line-afore { stroke: #64748b !important; }
+      input, select, textarea { background: #001633 !important; color: #ffffff !important; border: 1px solid rgba(148, 184, 224, 0.35) !important; }
+      .proposal-sidebar label { color: #f0f6ff !important; }
+
+      h1 { font-size: clamp(3rem, 8.5vw, 6.8rem); font-weight: 500; letter-spacing: -0.01em; line-height: 0.97; }
+      h2 { font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 500; line-height: 1.06; }
+      h3 { font-size: 1.45rem; font-weight: 600; }
+
+      /* ─── Entry animation ─────────────────────────────── */
+      .landing-enter { opacity: 0; transform: translateY(14px); }
+      body { transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+      /* ─── Hero tipográfico ────────────────────────────── */
+      .hero-text {
+        padding: max(140px, 15svh) 24px max(90px, 9svh);
+        background: var(--surface);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+      }
+
+      .hero-text::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 90% 55% at 50% -5%,
+            color-mix(in srgb, var(--brand) 9%, transparent) 0%, transparent 65%),
+          radial-gradient(ellipse 50% 35% at 88% 90%,
+            color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 55%);
+        pointer-events: none;
+      }
+
+      .hero-text-inner { position: relative; max-width: 860px; margin: 0 auto; }
+
+      .hero-rule {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .hero-rule span { height: 1px; width: 48px; background: rgba(0, 55, 129, 0.25); }
+      .hero-rule .eyebrow { margin: 0; color: #003781; font-weight: 700; }
+
+      /* Badges / pills debajo del eyebrow */
+      .hero-pills {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+      }
+
+      .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 6px 14px;
+        background: #eef5ff;
+        color: #003781;
+        border: 1px solid rgba(0, 55, 129, 0.18);
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .hero-text .lead {
+        max-width: 640px;
+        margin: 26px auto 0;
+        color: var(--muted);
+        font-size: 1.12rem;
+        line-height: 1.72;
+      }
+
+      .hero-text .hero-actions {
+        margin-top: 36px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      /* ─── Scenario blocks ─────────────────────────────── */
+      .scenario-block { padding: 24px 28px; }
+      .scenario-block + .scenario-block { border-top: 1px solid var(--line); }
+
+      .scenario-block-ppr { background: color-mix(in srgb, var(--brand-50) 30%, white); }
+
+      .scenario-block-afore {
+        background: #fff;
+        border-left: 4px solid var(--accent);
+        padding-left: 24px;
+      }
+
+      .scenario-tag-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+
+      .scenario-tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 5px 13px;
+        font-family: var(--font-sans);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+
+      .scenario-tag-ppr  { background: var(--brand); color: #fff; }
+      .scenario-tag-afore {
+        background: var(--accent-50);
+        color: var(--accent);
+        border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+      }
+
+      .scenario-sub { margin: 0; color: var(--muted); font-size: 0.84rem; font-weight: 500; }
+
+      .scenario-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+      @media (max-width: 520px) { .scenario-numbers { grid-template-columns: 1fr; gap: 14px; } }
+
+      .scenario-col { display: grid; gap: 5px; }
+
+      .scenario-label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+
+      /* PPR numbers — verde */
+      .scenario-block-ppr .scenario-capital-num {
+        font-family: var(--font-display);
+        font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+        font-weight: 600;
+        color: var(--brand);
+        line-height: 1;
+        display: block;
+      }
+
+      .scenario-block-ppr .scenario-pension-num {
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+        font-size: clamp(1.4rem, 3vw, 2.1rem);
+        font-weight: 700;
+        color: var(--brand);
+        line-height: 1;
+      }
+
+      /* AFORE numbers — ámbar */
+      .scenario-capital-afore {
+        font-family: var(--font-display);
+        font-size: clamp(1.9rem, 4.2vw, 2.9rem);
+        font-weight: 600;
+        color: var(--accent);
+        line-height: 1;
+        display: block;
+      }
+
+      .scenario-pension-afore {
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+        font-size: clamp(1.15rem, 2.6vw, 1.75rem);
+        font-weight: 700;
+        color: var(--accent);
+        line-height: 1;
+      }
+
+      .scenario-pension-num small,
+      .scenario-pension-afore small { font-size: 0.62em; font-weight: 700; opacity: 0.7; color: inherit; }
+
+      .scenario-note { display: block; margin-top: 4px; color: var(--muted); font-size: 0.73rem; font-style: normal; font-weight: 500; }
+
+      .scenario-diff {
+        margin: 0 28px 4px;
+        padding: 13px 18px;
+        border-radius: var(--radius-md);
+        background: color-mix(in srgb, var(--brand) 6%, white);
+        border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .scenario-diff span { color: var(--muted); font-size: 0.82rem; font-weight: 600; }
+      .scenario-diff strong { color: var(--brand); font-size: 1rem; font-weight: 800; }
+
+      .statement-disclaimer { margin: 0; padding: 16px 28px 22px; color: var(--faint); font-size: 0.72rem; line-height: 1.6; border-top: 1px solid var(--line); }
+
+      /* ─── Flexibilidad ────────────────────────────────── */
+      .flex-section { background: var(--surface); }
+
+      .flex-grid {
+        max-width: 1120px;
+        margin: 52px auto 0;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      @media (max-width: 900px) { .flex-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 520px) { .flex-grid { grid-template-columns: 1fr; } }
+
+      .flex-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow-card);
+        padding: 28px 24px;
+      }
+
+      .flex-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-md);
+        background: var(--brand-50);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        color: var(--brand);
+        flex-shrink: 0;
+      }
+
+      .flex-icon svg { width: 22px; height: 22px; }
+
+      .flex-card h3 { font-size: 1.1rem; margin: 0 0 10px; }
+      .flex-card p  { color: var(--muted); font-size: 0.92rem; line-height: 1.65; margin: 0; }
+
+      /* ─── Comparativa ─────────────────────────────────── */
+      .compare-section { background: var(--paper); }
+
+      .compare-grid {
+        max-width: 980px;
+        margin: 52px auto 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
+      }
+
+      @media (max-width: 700px) { .compare-grid { grid-template-columns: 1fr; } }
+
+      .compare-card {
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+
+      .compare-winner {
+        border-color: color-mix(in srgb, var(--brand) 32%, var(--line));
+        box-shadow: 0 8px 36px color-mix(in srgb, var(--brand) 10%, transparent);
+      }
+
+      .compare-card-head { padding: 22px 26px 20px; }
+
+      .compare-winner .compare-card-head {
+        background: linear-gradient(135deg, var(--brand), var(--brand-600));
+      }
+
+      .compare-other .compare-card-head {
+        background: #1b2e25 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+      }
+
+      .compare-label {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+
+      .compare-winner .compare-label { color: #fff; }
+      .compare-other  .compare-label { color: #ffffff !important; }
+
+      .compare-card-head small { font-size: 0.76rem; font-weight: 500; }
+      .compare-winner .compare-card-head small { color: rgba(255,255,255,0.68); }
+      .compare-other  .compare-card-head small { color: rgba(255, 255, 255, 0.82) !important; }
+
+      .compare-list {
+        list-style: none;
+        padding: 22px 26px;
+        margin: 0;
+        display: grid;
+        gap: 14px;
+      }
+
+      .compare-winner .compare-list { background: color-mix(in srgb, var(--brand-50) 28%, white); }
+      .compare-other  .compare-list { background: white; }
+
+      .compare-list li {
+        display: flex;
+        gap: 11px;
+        color: #0f271f !important;  /* forzado: evita que el tema sobreescriba */
+        font-size: 0.92rem;
+        line-height: 1.55;
+        align-items: flex-start;
+      }
+
+      .compare-list li::before {
+        content: "";
+        flex-shrink: 0;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-top: 1px;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 11px;
+      }
+
+      .compare-winner .compare-list li::before {
+        background-color: var(--brand);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      }
+
+      .compare-other .compare-list li::before {
+        background-color: color-mix(in srgb, var(--danger) 14%, white);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 3l6 6M9 3l-6 6' stroke='%23b42318' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+      }
+
+      .compare-note {
+        max-width: 980px;
+        margin: 20px auto 0;
+        color: var(--faint);
+        font-size: 0.76rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      /* ─── Asesor ──────────────────────────────────────── */
+      .advisor-section { background: var(--surface); padding: 80px 24px 100px; }
+
+      .advisor-card {
+        max-width: 1020px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        border: 1px solid rgba(0, 55, 129, 0.22);
+        background: linear-gradient(135deg, #ffffff 55%, #f0f6ff 100%);
+        box-shadow: 0 20px 50px rgba(0, 55, 129, 0.12);
+      }
+
+      @media (max-width: 860px) { .advisor-card { grid-template-columns: 1fr; } }
+
+      .advisor-photo-wrap { position: relative; overflow: hidden; min-height: 460px; background: #002c6b; }
+
+      @media (max-width: 860px) { .advisor-photo-wrap { min-height: 340px; } }
+
+      .advisor-photo-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+
+      .advisor-photo-wrap::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, transparent 55%, rgba(255, 255, 255, 0.8) 85%, #ffffff 100%);
+      }
+
+      @media (max-width: 860px) {
+        .advisor-photo-wrap::after {
+          background: linear-gradient(to bottom, transparent 65%, rgba(255, 255, 255, 0.85) 88%, #ffffff 100%);
+        }
+      }
+
+      .advisor-text { padding: 52px 48px 52px 36px; display: flex; flex-direction: column; justify-content: center; }
+
+      @media (max-width: 860px) { .advisor-text { padding: 28px 28px 40px; } }
+
+      .advisor-text .eyebrow { margin-bottom: 10px; color: #003781 !important; font-weight: 700; }
+      .advisor-text h2       { margin: 0 0 22px; color: #0f271f; }
+      .advisor-text p        { color: #1e3a47 !important; font-size: 1.02rem; line-height: 1.7; margin-bottom: 16px; }
+      .advisor-text .btn     {
+        align-self: flex-start;
+        margin-top: 8px;
+        background: #003781 !important;
+        border-color: #003781 !important;
+        color: #ffffff !important;
+        box-shadow: 0 10px 24px rgba(0, 55, 129, 0.28);
+      }
+      .advisor-text .btn:hover {
+        background: #002456 !important;
+        border-color: #002456 !important;
+      }
+
+      /* Alto contraste y tonos azules para botones de agenda */
+      a[href*="calendly"]:not(.advisor-text .btn),
+      .btn-ghost {
+        background: #0f271f !important;
+        color: #ffffff !important;
+        border: 2px solid #0f271f !important;
+      }
+      a[href*="calendly"]:not(.advisor-text .btn):hover,
+      .btn-ghost:hover {
+        background: #1b3d32 !important;
+        color: #ffffff !important;
+      }
+
+      /* SAT */
+      .sat-copy h3 { margin-top: 8px; font-size: 1.2rem; }
+
+      /* Alto contraste para sección comparativa (fondo verde oscuro) */
+      .compare-section .section-heading h2,
+      .compare-section .section-heading .eyebrow {
+        color: #ffffff !important;
+      }
+      .compare-section .section-heading p,
+      .compare-note {
+        color: rgba(255, 255, 255, 0.88) !important;
+      }
+
+      /* Alto contraste para sección de notas (fondo claro) */
+      .notes-section .section-heading h2,
+      .notes-section .section-heading .eyebrow,
+      .note-card h3 {
+        color: #0f271f !important;
+      }
+      .notes-section .section-heading p,
+      .note-card p {
+        color: #2d423b !important;
+      }
+
+      /* Negritas destacadas en montos, plazos y leyendas de gráfica */
+      .scenario-capital-num,
+      .scenario-pension-num,
+      .statement-badge,
+      .statement-ledger strong {
+        font-weight: 900 !important;
+      }
+      .chart-legend span {
+        font-weight: 800 !important;
+        color: #0f271f !important;
+      }
+      .chart-label {
+        fill: #0f271f !important;
+        font-weight: 700 !important;
+      }
+    </style>
+  </head>
+  <body class="theme-green proposal-vault proposal-cinema">
+
+    <header class="site-header" aria-label="Navegación principal">
+      <a class="brand-mark" href="#top">Retiro con estrategia</a>
+      <a class="btn btn-outline btn-small" href="#calculadora">Calcular mi retiro</a>
+    </header>
+
+    <main>
+
+      <!-- ── Hero ───────────────────────────────────────── -->
+      <section class="hero-text" id="top">
+        <div class="hero-text-inner reveal">
+          <div class="hero-rule">
+            <span></span>
+            <p class="eyebrow">Plan Personal de Retiro · Allianz</p>
+            <span></span>
+          </div>
+          <div class="hero-pills">
+            <span class="hero-pill">Desde $2,000 al mes</span>
+            <span class="hero-pill">100% flexible</span>
+            <span class="hero-pill">Deducible de impuestos</span>
+          </div>
+          <h1>Casi nadie sabe lo que va a recibir cuando se retire.</h1>
+          <p class="lead">
+            Ya seas empleado, dueño de negocio o emprendedor, esta es la estrategia para no tener que trabajar por obligación el resto de tu vida cuando llegues a los 65. Construye un patrimonio robusto y una renta vitalicia garantizada de por vida.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-large" href="#calculadora">Calcular mi retiro</a>
+            <a class="btn btn-ghost btn-large" href="https://calendly.com/hanspmz-dev/45min" target="_blank" rel="noopener noreferrer">
+              Agenda tu asesoría de retiro
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Ticker ──────────────────────────────────────── -->
+      <section class="motion-strip" aria-label="Ruta del plan">
+        <div class="ticker-track">
+          <span>Estrategia patrimonial</span><span>Interés compuesto</span><span>Beneficio fiscal SAT</span>
+          <span>100% Flexible</span><span>Respaldo Allianz</span><span>Visión de largo plazo</span>
+          <span>Estrategia patrimonial</span><span>Interés compuesto</span><span>Beneficio fiscal SAT</span>
+          <span>100% Flexible</span><span>Respaldo Allianz</span><span>Visión de largo plazo</span>
+        </div>
+      </section>
+
+      <!-- ── Intro cards ─────────────────────────────────── -->
+      <section class="section intro-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">La idea en simple</p>
+          <h2>Una estrategia para construir tu patrimonio de forma consciente, con visión de largo plazo.</h2>
+        </div>
+        <div class="value-grid reveal" aria-label="Beneficios principales">
+          <article data-tilt>
+            <span>01</span>
+            <h3>El tiempo y los rendimientos juegan a tu favor</h3>
+            <p>Accedes a una selección de 19 portafolios de inversión global con los mejores rendimientos del mercado. Diseñamos juntos la estrategia ideal para tu perfil y dejamos que el interés compuesto multiplique tu capital en el tiempo.</p>
+          </article>
+          <article data-tilt>
+            <span>02</span>
+            <h3>El SAT puede devolverte parte de lo que ahorraste</h3>
+            <p>Si declaras impuestos, tus aportaciones al PPR pueden ser deducibles. En muchos casos, el SAT literalmente te regresa dinero en tu declaración anual.</p>
+          </article>
+          <article data-tilt>
+            <span>03</span>
+            <h3>Al terminar tu plazo, tú decides cómo recibirlo</h3>
+            <p>Aquí ves claras tus proyecciones desde hoy. Y cuando llegue el momento, tienes total libertad: puedes retirar todo tu capital en un solo pago o elegir una pensión mensual de por vida.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Calculadora ─────────────────────────────────── -->
+      <section class="section calculator-section" id="calculadora">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Calculadora</p>
+          <h2>¿Cuánto tendrías si empezaras hoy?</h2>
+          <p>Ingresa tu edad y cuánto podrías aportar al mes. Descubre el capital proyectado y la renta vitalicia que te pagaría el plan de por vida —incluso si vives más de 100 años.</p>
+        </div>
+
+        <div class="calculator-card reveal" data-tilt>
+          <form class="calculator-form" id="calculator-form">
+            <div class="form-grid">
+              <label class="field">
+                <span>Edad actual</span>
+                <input id="age-input" type="number" min="18" max="60" value="30" inputmode="numeric" />
+                <small id="age-help"></small>
+              </label>
+              <label class="field">
+                <span>¿Cuánto podrías aportar al mes?</span>
+                <input id="contribution-input" type="number" min="2000" step="500" value="4000" inputmode="numeric" />
+                <small id="contribution-help"></small>
+              </label>
+            </div>
+            <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: center;">
+              <button class="btn btn-primary btn-large" type="submit" id="calc-submit-btn" style="min-width: 260px; font-weight: 700;">
+                Calcular mi retiro
+              </button>
+            </div>
+          </form>
+
+          <div class="result-panel" id="retirement-result" aria-live="polite"></div>
+
+          <div class="sat-step" id="sat-step">
+            <button class="btn btn-primary" id="show-sat-button" type="button">
+              ¿Cuánto me podría regresar el SAT?
+            </button>
+
+            <div class="sat-panel" id="sat-panel" hidden>
+              <div class="sat-copy">
+                <p class="eyebrow">Estimación fiscal</p>
+                <h3>Agrega tu ingreso mensual para ver cuánto podrías recuperar.</h3>
+                <p>Tomamos la aportación que ya pusiste arriba y calculamos qué tanto es deducible según tu nivel de ingreso.</p>
+              </div>
+
+              <div class="form-grid sat-form-grid">
+                <label class="field">
+                  <span>Sueldo mensual bruto</span>
+                  <input id="salary-input" type="number" value="50000" step="1000" inputmode="numeric" />
+                  <small>Antes de impuestos. Lo multiplicamos por 12 para el cálculo anual.</small>
+                </label>
+              </div>
+
+              <div class="sat-result" id="sat-result" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Flexibilidad ────────────────────────────────── -->
+      <section class="section flex-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Condiciones del plan</p>
+          <h2>Un plan que se adapta a ti, no al revés.</h2>
+          <p>La mayoría de los productos de retiro te amarran. Este no.</p>
+        </div>
+
+        <div class="flex-grid reveal">
+          <div class="flex-card">
+            <div class="flex-icon" aria-hidden="true">
+              <!-- Pause icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+              </svg>
+            </div>
+            <h3>Puedes tomar una pausa</h3>
+            <p>Si se presenta un imprevisto puedes pausar tus aportaciones sin penalización y retomarlas cuando estés listo.</p>
+          </div>
+
+          <div class="flex-card">
+            <div class="flex-icon" aria-hidden="true">
+              <!-- Calendar / clock icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3>Retiras desde el año y medio</h3>
+            <p>Después de 18 meses de haberlo comenzado, puedes disponer de parte de tu capital acumulado sin cerrar el plan.</p>
+          </div>
+
+          <div class="flex-card">
+            <div class="flex-icon" aria-hidden="true">
+              <!-- Sliders icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+                <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+                <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/>
+                <line x1="17" y1="16" x2="23" y2="16"/>
+              </svg>
+            </div>
+            <h3>El monto lo decides tú</h3>
+            <p>Empiezas desde $2,000 al mes. Puedes subir o ajustar tu aportación conforme mejore o cambie tu situación financiera.</p>
+          </div>
+
+          <div class="flex-card">
+            <div class="flex-icon" aria-hidden="true">
+              <!-- Shield icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3>Sin aumentos por tu edad</h3>
+            <p>A diferencia de un seguro, tu aportación no sube cada año por cumplir más edad. Solo se actualiza ligeramente conforme a la inflación para proteger el valor real de tu dinero.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Notas ───────────────────────────────────────── -->
+      <section class="section notes-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Antes de decidir</p>
+          <h2>Dos cosas que vale la pena tener claras.</h2>
+        </div>
+        <div class="note-grid reveal" id="note-grid"></div>
+      </section>
+
+      <!-- ── Comparativa ────────────────────────────────── -->
+      <section class="section compare-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Por qué este plan</p>
+          <h2>Hay otras opciones. Aquí está la diferencia.</h2>
+          <p>Antes de decidir conviene entender qué tienen —y qué no tienen— otros productos de retiro en el mercado.</p>
+        </div>
+
+        <div class="compare-grid reveal">
+
+          <!-- PPR Allianz -->
+          <div class="compare-card compare-winner">
+            <div class="compare-card-head">
+              <span class="compare-label">PPR Allianz</span>
+              <small>Plan Personal de Retiro · desde $2,000/mes</small>
+            </div>
+            <ul class="compare-list">
+              <li>Desde $2,000 al mes — todo va directo a tu ahorro e inversión.</li>
+              <li>Costo mensual fijo. No sube año con año conforme cumples más edad.</li>
+              <li>Flexible: puedes pausar y retirar parcialmente desde el año y medio.</li>
+              <li>Deduces el 100% de tus aportaciones (hasta el tope legal del SAT).</li>
+              <li>Crece con rendimientos de mercado, por encima de la inflación.</li>
+            </ul>
+          </div>
+
+          <!-- Seguro para el Retiro -->
+          <div class="compare-card compare-other">
+            <div class="compare-card-head">
+              <span class="compare-label">Seguro para el Retiro</span>
+              <small>GNP · Seguros Monterrey · Prudential · MetLife</small>
+            </div>
+            <ul class="compare-list">
+              <li>De $4,000 al mes, cerca de $2,400 pagan el seguro de vida. Solo ~$1,600 llegan a tu ahorro.</li>
+              <li>El costo no es fijo: sube cada año que cumples más edad.</li>
+              <li>Sin acceso a tu dinero los primeros 10 años. Cero flexibilidad.</li>
+              <li>Solo deduces lo que va a ahorro (~30%); el otro 70% que paga el seguro no cuenta.</li>
+              <li>Crece a ritmo de inflación con UDIS. No genera rendimiento real sobre tu dinero.</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <p class="compare-note reveal">
+          Datos generales. Cada compañía y póliza puede variar. Si ya tienes uno, tu asesor puede revisarlo contigo en la sesión.
+        </p>
+      </section>
+
+      <!-- ── Asesor ───────────────────────────────────────── -->
+      <section class="advisor-section">
+        <div class="advisor-card reveal">
+          <div class="advisor-photo-wrap">
+            <img src="hans-advisor.jpg" alt="Hans P Marquez, asesor patrimonial Allianz" />
+          </div>
+          <div class="advisor-text">
+            <p class="eyebrow">Quién te acompaña</p>
+            <h2>Soy Hans P Marquez.</h2>
+            <p>
+              Llevo más de 5 años estructurando planes patrimoniales sólidos para quienes buscan retirarse con total independencia financiera. Te asesoro de principio a fin para tomar hoy las decisiones que tu yo del futuro agradecerá toda la vida.
+            </p>
+            <p>
+              Trabajo con soluciones de Allianz — la aseguradora con mayor valor de marca en el mundo — porque creo que el respaldo institucional importa tanto como la estrategia.
+            </p>
+            <a class="btn btn-primary btn-large" href="https://calendly.com/hanspmz-dev/45min" target="_blank" rel="noopener noreferrer">
+              Agenda tu asesoría para iniciar tu plan de retiro
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <script src="script.js" defer></script>
+    <script>
+      (function () {
+        document.body.classList.add("landing-enter");
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document.body.classList.remove("landing-enter");
+          });
+        });
+      })();
+    </script>
+
+  </body>
+</html>

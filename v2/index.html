@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Calcula cuánto podrías tener al retirarte, compara con el AFORE y estima tu pensión mensual. Plan Personal de Retiro con Allianz."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,600;6..72,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <title>Plan de Retiro · Allianz · Hans P Marquez</title>
+    <style>
+      /* ── Entry animation ───────────────────────────────── */
+      .landing-enter {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      body {
+        transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      /* ── Scenario comparison blocks ────────────────────── */
+      .scenario-block {
+        padding: 22px 28px;
+      }
+
+      .scenario-block + .scenario-block {
+        border-top: 1px solid var(--line);
+      }
+
+      .scenario-block-ppr {
+        background: linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--brand-50) 65%, white) 0%,
+          white 55%
+        );
+      }
+
+      .scenario-block-afore {
+        background: var(--surface-soft);
+      }
+
+      .scenario-tag-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      .scenario-tag {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 5px 13px;
+        font-family: var(--font-sans);
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+
+      .scenario-tag-ppr {
+        background: var(--brand);
+        color: white;
+      }
+
+      .scenario-tag-afore {
+        background: var(--accent-50);
+        color: var(--accent);
+        border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line));
+      }
+
+      .scenario-sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.84rem;
+        font-weight: 500;
+      }
+
+      .scenario-numbers {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 520px) {
+        .scenario-numbers {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+      }
+
+      .scenario-col {
+        display: grid;
+        gap: 5px;
+      }
+
+      .scenario-label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+
+      /* PPR — números grandes y verdes */
+      .scenario-block-ppr .scenario-capital-num {
+        font-family: var(--font-display);
+        font-size: clamp(2.2rem, 5vw, 3.4rem);
+        font-weight: 700;
+        color: var(--brand);
+        line-height: 1;
+        display: block;
+      }
+
+      .scenario-block-ppr .scenario-pension-num {
+        font-size: clamp(1.35rem, 3vw, 2rem);
+        font-weight: 800;
+        color: var(--brand);
+        line-height: 1;
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+      }
+
+      /* AFORE — números más discretos */
+      .scenario-capital-afore {
+        font-family: var(--font-display);
+        font-size: clamp(1.7rem, 4vw, 2.6rem) !important;
+        font-weight: 650;
+        color: var(--ink) !important;
+        line-height: 1;
+        display: block;
+      }
+
+      .scenario-pension-afore {
+        font-size: clamp(1.1rem, 2.5vw, 1.65rem) !important;
+        font-weight: 700;
+        color: var(--ink) !important;
+        line-height: 1;
+        display: flex;
+        align-items: baseline;
+        gap: 3px;
+      }
+
+      .scenario-pension-num small,
+      .scenario-pension-afore small {
+        font-size: 0.65em;
+        font-weight: 700;
+        opacity: 0.7;
+      }
+
+      .scenario-note {
+        display: block;
+        margin-top: 4px;
+        color: var(--faint);
+        font-size: 0.74rem;
+        font-style: normal;
+        font-weight: 500;
+      }
+
+      /* Diferencia entre escenarios */
+      .scenario-diff {
+        margin: 0 28px 4px;
+        padding: 13px 18px;
+        border-radius: var(--radius-md);
+        background: color-mix(in srgb, var(--brand) 7%, white);
+        border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .scenario-diff span {
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .scenario-diff strong {
+        color: var(--brand);
+        font-size: 1rem;
+        font-weight: 800;
+      }
+
+      /* Disclaimer al pie de la tarjeta */
+      .statement-disclaimer {
+        margin: 0;
+        padding: 16px 28px 22px;
+        color: var(--faint);
+        font-size: 0.72rem;
+        line-height: 1.6;
+        border-top: 1px solid var(--line);
+      }
+
+      /* ── SAT copy inline ───────────────────────────────── */
+      .sat-copy h3 {
+        margin-top: 8px;
+        font-size: 1.15rem;
+      }
+    </style>
+  </head>
+  <body class="theme-green proposal-vault proposal-cinema">
+
+    <header class="site-header" aria-label="Navegación principal">
+      <a class="brand-mark" href="#top">Retiro con estrategia</a>
+      <a class="btn btn-outline btn-small" href="#calculadora">Ver mi escenario</a>
+    </header>
+
+    <main>
+
+      <!-- ── Hero ──────────────────────────────────────────── -->
+      <section class="hero" id="top">
+        <div class="hero-media">
+          <img src="../assets/asesor-retrato.jpg" alt="Asesor patrimonial Hans P Marquez" />
+          <div class="hero-fade" aria-hidden="true"></div>
+          <div class="hero-motion" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Plan Personal de Retiro · Allianz</p>
+          <h1>Casi nadie sabe lo que va a recibir cuando se retire.</h1>
+          <p class="lead">
+            Tu AFORE existe, pero en la mayoría de los casos no alcanza para mantener tu nivel de vida. Aquí puedes ver exactamente cuánto podrías construir aparte, con una aportación mensual que tú controlas.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-large" href="#calculadora">Ver mi escenario</a>
+            <a class="btn btn-ghost btn-large" href="https://scheduler.zoom.us/cristinartz/ppr" target="_blank" rel="noopener noreferrer">
+              Agendar diagnóstico
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Ticker ─────────────────────────────────────────── -->
+      <section class="motion-strip" aria-label="Ruta del plan">
+        <div class="ticker-track">
+          <span>Aprender</span><span>Aportar</span><span>Deducir</span>
+          <span>Revisar</span><span>Ajustar</span><span>Proteger</span>
+          <span>Aprender</span><span>Aportar</span><span>Deducir</span>
+          <span>Revisar</span><span>Ajustar</span><span>Proteger</span>
+        </div>
+      </section>
+
+      <!-- ── Intro cards ─────────────────────────────────────── -->
+      <section class="section intro-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">La idea en simple</p>
+          <h2>No se trata de comprar un seguro. Se trata de construir algo que dure.</h2>
+        </div>
+        <div class="value-grid reveal" aria-label="Beneficios principales">
+          <article data-tilt>
+            <span>01</span>
+            <h3>Tu dinero trabaja mientras tú no</h3>
+            <p>Cada mes que aportas, el plan lo invierte. Los rendimientos generan más rendimientos. Con los años, eso suma bastante más de lo que imaginas.</p>
+          </article>
+          <article data-tilt>
+            <span>02</span>
+            <h3>El SAT puede devolverte parte de lo que ahorraste</h3>
+            <p>Si declaras impuestos, tus aportaciones al PPR pueden ser deducibles. En muchos casos, el SAT literalmente te regresa dinero en tu declaración anual.</p>
+          </article>
+          <article data-tilt>
+            <span>03</span>
+            <h3>Primero los números, después la decisión</h3>
+            <p>Nada que decidir a ciegas. Aquí ves cuánto tendrías a los 65, cuánto sería tu pensión mensual y cómo se compara con quedarte solo con el AFORE.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Calculadora ─────────────────────────────────────── -->
+      <section class="section calculator-section" id="calculadora">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Calculadora</p>
+          <h2>¿Cuánto tendrías si empezaras hoy?</h2>
+          <p>Ingresa tu edad y cuánto podrías aportar al mes. La calculadora muestra tu capital estimado a los 65, la pensión mensual aproximada que eso representaría, y qué tanto se compara con dejarlo solo en el AFORE.</p>
+        </div>
+
+        <div class="calculator-card reveal" data-tilt>
+          <form class="calculator-form" id="calculator-form">
+            <div class="form-grid">
+              <label class="field">
+                <span>Edad actual</span>
+                <input id="age-input" type="number" min="18" max="60" value="30" inputmode="numeric" />
+                <small id="age-help"></small>
+              </label>
+              <label class="field">
+                <span>¿Cuánto podrías aportar al mes?</span>
+                <input id="contribution-input" type="number" min="2000" step="500" value="4000" inputmode="numeric" />
+                <small id="contribution-help"></small>
+              </label>
+            </div>
+          </form>
+
+          <div class="result-panel" id="retirement-result" aria-live="polite"></div>
+
+          <div class="sat-step" id="sat-step">
+            <button class="btn btn-primary" id="show-sat-button" type="button">
+              ¿Cuánto me podría regresar el SAT?
+            </button>
+
+            <div class="sat-panel" id="sat-panel" hidden>
+              <div class="sat-copy">
+                <p class="eyebrow">Estimación fiscal</p>
+                <h3>Agrega tu ingreso mensual para ver cuánto podrías recuperar.</h3>
+                <p>Tomamos la aportación que ya pusiste arriba y calculamos qué tanto es deducible según tu nivel de ingreso.</p>
+              </div>
+
+              <div class="form-grid sat-form-grid">
+                <label class="field">
+                  <span>Sueldo mensual bruto</span>
+                  <input id="salary-input" type="number" value="50000" step="1000" inputmode="numeric" />
+                  <small>Antes de impuestos. Lo multiplicamos por 12 para el cálculo anual.</small>
+                </label>
+              </div>
+
+              <div class="sat-result" id="sat-result" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Notas ───────────────────────────────────────────── -->
+      <section class="section notes-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Antes de decidir</p>
+          <h2>Dos cosas que vale la pena tener claras.</h2>
+        </div>
+        <div class="note-grid reveal" id="note-grid"></div>
+      </section>
+
+      <!-- ── Asesor ──────────────────────────────────────────── -->
+      <section class="advisor-section">
+        <div class="advisor-inner reveal">
+          <img src="../assets/asesor-retrato.jpg" alt="Hans P Marquez, asesor patrimonial Allianz" />
+          <div class="advisor-copy">
+            <p class="eyebrow">Quién te acompaña</p>
+            <h2>Soy Hans P Marquez.</h2>
+            <p>
+              Llevo más de cinco años ayudando a personas a construir planes de largo plazo que en el momento se sienten grandes, pero después se convierten en las mejores decisiones que tomaron.
+            </p>
+            <p>
+              Trabajo con soluciones de Allianz — la aseguradora con mayor valor de marca en el mundo — porque creo que el respaldo institucional importa tanto como la estrategia.
+            </p>
+            <a class="btn btn-primary btn-large" href="https://scheduler.zoom.us/cristinartz/ppr" target="_blank" rel="noopener noreferrer">
+              Agendar diagnóstico
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Script propio de v2 (con pensión vitalicia y copies mejorados) -->
+    <script src="script.js" defer></script>
+
+    <script>
+      /* Entry animation al llegar desde intro.html */
+      (function () {
+        document.body.classList.add("landing-enter");
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document.body.classList.remove("landing-enter");
+          });
+        });
+      })();
+    </script>
+
+  </body>
+</html>

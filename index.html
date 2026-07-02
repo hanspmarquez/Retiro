@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Calcula tu plan de retiro, visualiza el impacto de ahorrar a largo plazo y estima una posible devolución del SAT."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,600;6..72,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" href="assets/call-background.png" as="image" />
+    <link rel="preload" href="assets/call-advisor.png" as="image" />
+    <link rel="preload" href="assets/call-audio.m4a" as="audio" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Plan de Retiro · Propuesta Verde 01</title>
+  </head>
+  <body class="theme-green proposal-vault proposal-cinema">
+    <section class="experience-shell" id="experiencia" aria-label="Experiencia inicial">
+      <div class="call-screen" data-state="incoming" aria-live="polite">
+        <img class="call-backdrop" src="assets/call-background.png" alt="" />
+        <div class="call-shade call-shade-top"></div>
+        <div class="call-shade call-shade-bottom"></div>
+        <div class="call-vignette"></div>
+
+        <header class="call-brand-row">
+          <span class="call-brand-line"></span>
+          <span>Retiro con estrategia</span>
+        </header>
+
+        <span class="call-corner call-corner-tl"></span>
+        <span class="call-corner call-corner-tr"></span>
+        <span class="call-corner call-corner-bl"></span>
+        <span class="call-corner call-corner-br"></span>
+
+        <div class="call-content">
+          <div class="caller-stack">
+            <div class="avatar-stage">
+              <div class="ring-waves" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+
+              <svg class="progress-ring" viewBox="0 0 160 160" aria-hidden="true">
+                <circle class="progress-base" cx="80" cy="80" r="74"></circle>
+                <circle class="progress-value" cx="80" cy="80" r="74"></circle>
+              </svg>
+
+              <div class="avatar-wrap">
+                <img src="assets/call-advisor.png" alt="Asesor de retiro" />
+              </div>
+            </div>
+
+            <div class="caller-copy">
+              <h1>Asesor de retiro</h1>
+              <p class="caller-name">Llamada privada</p>
+            </div>
+
+            <div class="status-area">
+              <p class="status-text status-incoming">llamada entrante...</p>
+              <div class="status-active">
+                <span class="timer">00:00</span>
+                <div class="waveform" aria-hidden="true"></div>
+              </div>
+              <p class="status-text status-ended">llamada finalizada</p>
+            </div>
+          </div>
+
+          <button class="answer-button" type="button" aria-label="Contestar llamada">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.92.35 1.82.7 2.69a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.39-1.27a2 2 0 0 1 2.11-.45c.87.35 1.77.58 2.69.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <section class="question-screen" aria-labelledby="question-title">
+          <div class="question-inner">
+            <p class="question-kicker">Antes de continuar</p>
+            <h2 id="question-title">¿Alguna vez has calculado cuánto dinero podrías recibir cuando llegue tu retiro?</h2>
+            <div class="answers" role="group" aria-label="Opciones de respuesta">
+              <button type="button" data-answer="si">Sí</button>
+              <button type="button" data-answer="mas-o-menos">Más o menos</button>
+              <button type="button" data-answer="nunca">Nunca lo he calculado</button>
+            </div>
+          </div>
+        </section>
+
+        <audio class="call-audio" src="assets/call-audio.m4a" preload="auto"></audio>
+      </div>
+    </section>
+
+    <header class="site-header" aria-label="Navegación principal">
+      <a class="brand-mark" href="#top">Retiro con estrategia</a>
+      <a class="btn btn-outline btn-small" href="#calculadora">Calcular</a>
+    </header>
+
+    <main>
+      <section class="hero" id="top">
+        <div class="hero-media">
+          <img src="assets/asesor-retrato.jpg" alt="Asesor patrimonial de Allianz" />
+          <div class="hero-fade" aria-hidden="true"></div>
+          <div class="hero-motion" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Plan personal de retiro · Allianz</p>
+          <h1>Diseña tu retiro sin vivir adivinando.</h1>
+          <p class="lead">
+            Una forma clara de ver cuánto podrías construir, cuánto tendrías que aportar y qué papel puede jugar el SAT en tu estrategia.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-large" href="#calculadora">Hacer mi cálculo</a>
+            <a class="btn btn-ghost btn-large" href="https://scheduler.zoom.us/cristinartz/ppr" target="_blank" rel="noopener noreferrer">
+              Agendar diagnóstico
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="motion-strip" aria-label="Ruta del plan">
+        <div class="ticker-track">
+          <span>Aprender</span>
+          <span>Aportar</span>
+          <span>Deducir</span>
+          <span>Revisar</span>
+          <span>Ajustar</span>
+          <span>Proteger</span>
+          <span>Aprender</span>
+          <span>Aportar</span>
+          <span>Deducir</span>
+          <span>Revisar</span>
+          <span>Ajustar</span>
+          <span>Proteger</span>
+        </div>
+      </section>
+
+      <section class="section intro-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">La idea en simple</p>
+          <h2>No se trata de comprar un seguro. Se trata de construir patrimonio con intención.</h2>
+        </div>
+        <div class="value-grid reveal" aria-label="Beneficios principales">
+          <article data-tilt>
+            <span>01</span>
+            <h3>Tu dinero trabaja para ti</h3>
+            <p>Aportas de forma mensual y el plan lo invierte con una lógica de largo plazo.</p>
+          </article>
+          <article data-tilt>
+            <span>02</span>
+            <h3>La estrategia fiscal importa</h3>
+            <p>Según tu régimen, tus aportaciones pueden ayudarte a optimizar impuestos.</p>
+          </article>
+          <article data-tilt>
+            <span>03</span>
+            <h3>No lo decides a ciegas</h3>
+            <p>Primero ves números. Después decides si el plan realmente hace sentido para ti.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section calculator-section" id="calculadora">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Calculadora</p>
+          <h2>Empieza por tu retiro. Si te interesa, continúa con el SAT.</h2>
+          <p>Primero aterriza tu posible patrimonio. Después revisa si tus aportaciones podrían ayudarte fiscalmente.</p>
+        </div>
+
+        <div class="calculator-card reveal" data-tilt>
+          <form class="calculator-form" id="calculator-form">
+            <div class="form-grid">
+              <label class="field">
+                <span>Edad actual</span>
+                <input id="age-input" type="number" min="18" max="60" value="30" inputmode="numeric" />
+                <small id="age-help"></small>
+              </label>
+              <label class="field">
+                <span>Aportación mensual</span>
+                <input id="contribution-input" type="number" min="2000" step="500" value="4000" inputmode="numeric" />
+                <small id="contribution-help"></small>
+              </label>
+            </div>
+          </form>
+
+          <div class="result-panel" id="retirement-result" aria-live="polite"></div>
+
+          <div class="sat-step" id="sat-step">
+            <button class="btn btn-primary" id="show-sat-button" type="button">
+              ¿Cuánto me podría regresar el SAT?
+            </button>
+
+            <div class="sat-panel" id="sat-panel" hidden>
+              <div class="sat-copy">
+                <p class="eyebrow">Estimación fiscal</p>
+                <h3>Ahora agrega tu ingreso para estimar la devolución.</h3>
+                <p>Usamos tu aportación mensual del cálculo anterior como ahorro anual para el PPR.</p>
+              </div>
+
+              <div class="form-grid sat-form-grid">
+                <label class="field">
+                  <span>Sueldo mensual bruto</span>
+                  <input id="salary-input" type="number" value="50000" step="1000" inputmode="numeric" />
+                  <small>Ingreso antes de impuestos, multiplicado por 12.</small>
+                </label>
+              </div>
+
+              <div class="sat-result" id="sat-result" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section notes-section">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Dos aclaraciones</p>
+          <h2>Para empezar con la mentalidad correcta.</h2>
+        </div>
+        <div class="note-grid reveal" id="note-grid"></div>
+      </section>
+
+      <section class="advisor-section">
+        <div class="advisor-inner reveal">
+          <img src="assets/asesor-retrato.jpg" alt="Asesor patrimonial Allianz" />
+          <div class="advisor-copy">
+            <p class="eyebrow">Quién soy</p>
+            <h2>Soy Hans P Marquez.</h2>
+            <p>
+              Desde hace más de cinco años acompaño a personas que quieren construir patrimonio con más claridad,
+              estrategia y visión de largo plazo.
+            </p>
+            <p>
+              Trabajo con soluciones de Allianz, reconocida como la marca aseguradora número uno del mundo por valor
+              de marca, para ayudar a que cada plan tenga respaldo, estructura y sentido financiero.
+            </p>
+            <a class="btn btn-primary btn-large" href="https://scheduler.zoom.us/cristinartz/ppr" target="_blank" rel="noopener noreferrer">
+              Agendar diagnóstico
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
