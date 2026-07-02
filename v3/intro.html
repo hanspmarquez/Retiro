@@ -240,6 +240,38 @@
       .call-blue-light .call-screen[data-state="question"] .call-content {
         filter: blur(6px) brightness(0.86);
       }
+
+      .sound-gate {
+        position: absolute;
+        inset: 0;
+        z-index: 7;
+        display: grid;
+        place-items: end center;
+        padding: 28px;
+        background:
+          linear-gradient(180deg, rgba(245, 251, 255, 0.08), rgba(245, 251, 255, 0.82)),
+          rgba(245, 251, 255, 0.12);
+        opacity: 1;
+        pointer-events: auto;
+        transition: opacity 0.42s ease, transform 0.42s ease;
+      }
+
+      .sound-gate.is-hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px);
+      }
+
+      .sound-gate button {
+        border: 0;
+        border-radius: 999px;
+        padding: 14px 22px;
+        background: #047857;
+        color: #f5fbff;
+        box-shadow: 0 16px 34px rgba(4, 120, 87, 0.22);
+        font: 800 0.82rem/1 var(--font-sans);
+        letter-spacing: 0;
+      }
     </style>
   </head>
   <body class="theme-green proposal-vault proposal-cinema call-blue-light">
@@ -262,6 +294,10 @@
         <span class="call-corner call-corner-tr"></span>
         <span class="call-corner call-corner-bl"></span>
         <span class="call-corner call-corner-br"></span>
+
+        <div class="sound-gate" aria-label="Iniciar experiencia con sonido">
+          <button class="sound-gate-button" type="button">Tocar para iniciar</button>
+        </div>
 
         <div class="call-content">
           <div class="caller-stack">
@@ -349,8 +385,11 @@
         const waveform = document.querySelector(".waveform");
         const answerOptions = document.querySelectorAll(".answers button");
         const exitOverlay = document.querySelector("#exit-overlay");
+        const soundGate = document.querySelector(".sound-gate");
+        const soundGateButton = document.querySelector(".sound-gate-button");
 
         if (!screen || !audio || !answerButton || !timer || !progress || !waveform) return;
+        answerButton.disabled = true;
 
         // ── Constants ──────────────────────────────────────
         const audioSkipSeconds = 1;
@@ -438,6 +477,15 @@
 
           incomingSoundHasPlayed = true;
           ringStopTimeout = setTimeout(stopIncomingSound, incomingRingSeconds * 1000);
+        };
+
+        const unlockIncomingExperience = () => {
+          if (screen.dataset.sound === "on") return;
+          screen.dataset.sound = "on";
+          answerButton.disabled = false;
+          soundGate?.classList.add("is-hidden");
+          vibrateIncoming();
+          startIncomingSound();
         };
 
         const playEndedToneBeforeQuestion = async () => {
@@ -533,6 +581,7 @@
         };
 
         // ── Events ─────────────────────────────────────────
+        soundGateButton?.addEventListener("click", unlockIncomingExperience);
         answerButton.addEventListener("click", answerCall);
         audio.addEventListener("ended", finishCall);
         audio.addEventListener("loadedmetadata", () => {
@@ -557,17 +606,7 @@
         });
 
         // ── Start ──────────────────────────────────────────
-        vibrateIncoming();
-        startIncomingSound();
-        document.addEventListener(
-          "pointerdown",
-          (event) => {
-            if (event.target.closest("#answer-button")) return;
-            startIncomingSound();
-          },
-          { once: true }
-        );
-        document.addEventListener("keydown", startIncomingSound, { once: true });
+        document.addEventListener("keydown", unlockIncomingExperience, { once: true });
       })();
     </script>
   </body>
