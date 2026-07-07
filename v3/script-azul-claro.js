@@ -533,7 +533,6 @@ function renderRetirementResult() {
           <span class="statement-kicker">Estado de cuenta futuro</span>
           <h3>Tu escenario a los 65</h3>
         </div>
-        <span class="statement-badge">${years} años</span>
       </header>
 
       <!-- PPR Allianz -->
