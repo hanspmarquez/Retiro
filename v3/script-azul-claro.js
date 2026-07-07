@@ -105,6 +105,11 @@ function setupCalendlyModal() {
 
   let lastFocusedElement = null;
 
+  const trackMeta = (type, name, params = {}) => {
+    if (typeof window.fbq !== "function") return;
+    window.fbq(type, name, params);
+  };
+
   const getEmbedUrl = (url) => {
     const embedUrl = new URL(url);
     embedUrl.searchParams.set("hide_gdpr_banner", "1");
@@ -119,6 +124,10 @@ function setupCalendlyModal() {
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("calendly-open");
+    trackMeta("trackCustom", "OpenCalendly", {
+      content_name: "Agenda tu asesoria de retiro",
+      content_category: "Calendly",
+    });
     window.setTimeout(() => {
       modal.querySelector("[data-calendly-close]")?.focus();
     }, 80);
@@ -148,6 +157,28 @@ function setupCalendlyModal() {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && modal.classList.contains("is-open")) {
       closeModal();
+    }
+  });
+
+  window.addEventListener("message", (event) => {
+    if (!event.data || typeof event.data.event !== "string" || !event.data.event.startsWith("calendly.")) return;
+
+    if (event.data.event === "calendly.date_and_time_selected") {
+      trackMeta("trackCustom", "CalendlyDateSelected", {
+        content_name: "Asesoria de retiro",
+        content_category: "Calendly",
+      });
+    }
+
+    if (event.data.event === "calendly.event_scheduled") {
+      trackMeta("track", "Lead", {
+        content_name: "Asesoria de retiro agendada",
+        content_category: "Calendly",
+      });
+      trackMeta("trackCustom", "CalendlyScheduled", {
+        content_name: "Asesoria de retiro",
+        content_category: "Calendly",
+      });
     }
   });
 }
