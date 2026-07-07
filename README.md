@@ -1,11 +1,13 @@
 # Hans P Márquez | Patrimonio y retiro
 
-Sitio web para presentar una experiencia inicial de llamada y una landing de Plan Personal de Retiro con Allianz.
+Sitio web para presentar una landing de Plan Personal de Retiro con Allianz.
 
 ## Vista principal
 
-- Experiencia inicial: `v3/intro.html`
 - Landing final: `v3/index-azul-claro.html`
+- Experiencia de llamada guardada para uso futuro: `v3/intro-llamada-guardada.html.txt`
+
+Para reactivar la llamada, renombra el respaldo a `.html` y vuelve a enlazar `index.html` o `v3/intro.html` hacia ese archivo.
 
 ## Probar localmente
 
@@ -16,5 +18,5 @@ python3 -m http.server 8000
 Después abre:
 
 ```text
-http://localhost:8000/v3/intro.html
+http://localhost:8000/v3/index-azul-claro.html
 ```
