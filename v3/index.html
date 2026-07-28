@@ -1519,21 +1519,22 @@
 
         body.theme-blue-light .site-header {
           left: 12px !important;
-          right: auto !important;
-          width: calc(100vw - 24px) !important;
-          max-width: calc(100vw - 24px) !important;
+          right: 12px !important;
+          width: auto !important;
+          max-width: none !important;
           display: flex !important;
-          flex-direction: column !important;
-          align-items: flex-start !important;
-          justify-content: center !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          justify-content: space-between !important;
           gap: 8px !important;
-          border-radius: 24px !important;
-          padding: 12px 14px !important;
+          border-radius: 999px !important;
+          padding: 9px 10px 9px 14px !important;
         }
 
         body.theme-blue-light .brand-mark-full {
-          flex: 0 1 auto !important;
-          max-width: 100% !important;
+          flex: 1 1 auto !important;
+          min-width: 0 !important;
+          max-width: calc(100% - 112px) !important;
           overflow: hidden !important;
           text-overflow: ellipsis !important;
           white-space: nowrap !important;
@@ -1549,13 +1550,13 @@
 
         body.theme-blue-light .site-header .whatsapp-link {
           display: inline-flex !important;
-          flex: 0 0 auto !important;
-          width: auto !important;
-          min-width: 112px !important;
-          align-self: flex-start !important;
+          flex: 0 0 96px !important;
+          width: 96px !important;
+          min-width: 96px !important;
+          align-self: center !important;
           justify-self: auto !important;
           min-height: 34px !important;
-          padding: 0 14px !important;
+          padding: 0 10px !important;
           font-size: 0.78rem !important;
           white-space: nowrap !important;
         }
@@ -1626,13 +1627,13 @@
 
         body.theme-blue-light .site-header {
           left: 12px !important;
-          right: auto !important;
-          width: calc(100vw - 24px) !important;
-          max-width: calc(100vw - 24px) !important;
+          right: 12px !important;
+          width: auto !important;
+          max-width: none !important;
           display: flex !important;
-          flex-direction: column !important;
+          flex-direction: row !important;
           align-items: center !important;
-          justify-content: center !important;
+          justify-content: space-between !important;
           gap: 8px !important;
           padding: 9px 10px 9px 14px !important;
         }
@@ -1640,7 +1641,7 @@
         body.theme-blue-light .brand-mark-full {
           flex: 1 1 auto !important;
           min-width: 0 !important;
-          max-width: calc(100vw - 120px) !important;
+          max-width: calc(100% - 112px) !important;
           overflow: hidden !important;
           text-overflow: ellipsis !important;
           white-space: nowrap !important;
@@ -1656,10 +1657,10 @@
 
         body.theme-blue-light .site-header .whatsapp-link {
           display: inline-flex !important;
-          flex: 0 0 auto !important;
-          width: auto !important;
-          min-width: 112px !important;
-          align-self: flex-start !important;
+          flex: 0 0 96px !important;
+          width: 96px !important;
+          min-width: 96px !important;
+          align-self: center !important;
           justify-self: auto !important;
           padding: 0 10px !important;
           font-size: 0.76rem !important;
