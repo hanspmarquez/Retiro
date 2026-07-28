@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderNotes();
   setupCalculator();
   setupCalendlyModal();
+  setupWhatsAppTracking();
 });
 
 // ── Reveal on scroll ───────────────────────────────────────────────────────
@@ -96,6 +97,29 @@ function setupReveal() {
   items.forEach((item) => observer.observe(item));
 }
 
+function trackMeta(type, name, params = {}) {
+  if (typeof window.fbq !== "function") return;
+  window.fbq(type, name, params);
+}
+
+function setupWhatsAppTracking() {
+  const triggers = document.querySelectorAll("[data-whatsapp-trigger]");
+  if (!triggers.length) return;
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      trackMeta("track", "Contact", {
+        content_name: "Contacto por WhatsApp",
+        content_category: "WhatsApp",
+      });
+      trackMeta("trackCustom", "OpenWhatsApp", {
+        content_name: "Contacto por WhatsApp",
+        content_category: "WhatsApp",
+      });
+    });
+  });
+}
+
 function setupCalendlyModal() {
   const modal = document.querySelector("#calendly-modal");
   const frame = document.querySelector("#calendly-frame");
@@ -104,11 +128,6 @@ function setupCalendlyModal() {
   if (!modal || !frame || !triggers.length) return;
 
   let lastFocusedElement = null;
-
-  const trackMeta = (type, name, params = {}) => {
-    if (typeof window.fbq !== "function") return;
-    window.fbq(type, name, params);
-  };
 
   const getEmbedUrl = (url) => {
     const embedUrl = new URL(url);
