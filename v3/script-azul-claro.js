@@ -820,16 +820,116 @@ function setupInteractiveChart(root, projection, aforeProjection) {
   };
 
   const selectFromPointer = (event, revealPanel = true) => {
+    selectFromClientX(event.clientX, revealPanel);
+  };
+
+  const selectFromClientX = (clientX, revealPanel = true) => {
     const rect = svg.getBoundingClientRect();
     const viewBox = svg.viewBox.baseVal;
-    const relativeX = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const relativeX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     const svgX = viewBox.x + relativeX * viewBox.width;
     const progress = Math.max(0, Math.min(1, (svgX - plotLeft) / plotWidth));
     selectIndex(Math.round(progress * (projection.length - 1)), revealPanel);
   };
 
+  let activePointerId = null;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let gestureMode = null;
+  let pendingClientX = null;
+  let chartFrame = 0;
+
+  const schedulePointerSelect = (clientX) => {
+    pendingClientX = clientX;
+    if (chartFrame) return;
+    const run = () => {
+      chartFrame = 0;
+      if (pendingClientX !== null) {
+        selectFromClientX(pendingClientX, true);
+      }
+    };
+    chartFrame = (window.requestAnimationFrame || window.setTimeout)(run);
+  };
+
+  const capturePointer = (event) => {
+    try {
+      chart.setPointerCapture?.(event.pointerId);
+    } catch (_) {
+      // Some in-app browsers deny capture during scroll gestures.
+    }
+  };
+
+  const releasePointer = (event) => {
+    try {
+      if (typeof chart.hasPointerCapture !== "function" || chart.hasPointerCapture(event.pointerId)) {
+        chart.releasePointerCapture?.(event.pointerId);
+      }
+    } catch (_) {
+      // Ignore capture release differences across mobile browsers.
+    }
+  };
+
+  const clearPointer = (event) => {
+    if (activePointerId !== event.pointerId) return;
+    releasePointer(event);
+    activePointerId = null;
+    gestureMode = null;
+    pendingClientX = null;
+  };
+
   range.addEventListener("input", () => selectIndex(getIndexByAge(range.value), true));
-  chart.addEventListener("click", (event) => selectFromPointer(event, true));
+  chart.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    activePointerId = event.pointerId;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    gestureMode = event.pointerType === "mouse" ? "horizontal" : "pending";
+
+    if (event.pointerType === "mouse") {
+      capturePointer(event);
+      selectFromPointer(event, true);
+    }
+  });
+
+  chart.addEventListener("pointermove", (event) => {
+    if (activePointerId !== event.pointerId) return;
+
+    if (gestureMode === "pending") {
+      const deltaX = event.clientX - pointerStartX;
+      const deltaY = event.clientY - pointerStartY;
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+
+      if (absX < 8 && absY < 8) return;
+
+      if (absY > absX) {
+        clearPointer(event);
+        return;
+      }
+
+      gestureMode = "horizontal";
+      capturePointer(event);
+    }
+
+    if (gestureMode === "horizontal") {
+      event.preventDefault();
+      schedulePointerSelect(event.clientX);
+    }
+  }, { passive: false });
+
+  chart.addEventListener("pointerup", (event) => {
+    if (activePointerId !== event.pointerId) return;
+    if (gestureMode === "pending") {
+      selectFromPointer(event, true);
+    }
+    clearPointer(event);
+  });
+
+  chart.addEventListener("pointercancel", clearPointer);
+  chart.addEventListener("click", (event) => {
+    if (event.pointerType) return;
+    selectFromPointer(event, true);
+  });
 
   legend.setAttribute("aria-hidden", "true");
   control.setAttribute("aria-hidden", "true");

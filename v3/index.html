@@ -3978,6 +3978,36 @@
         line-height: 1.42 !important;
       }
 
+      /* Hero CTA: WhatsApp como acción principal, calculadora como secundaria */
+      body.theme-blue-light .hero-text .hero-actions .btn-primary:not(.whatsapp-link) {
+        background: linear-gradient(135deg, #ffffff 0%, #f5fbff 100%) !important;
+        border: 1px solid rgba(186, 230, 253, 0.72) !important;
+        color: #082f49 !important;
+        box-shadow:
+          0 18px 42px rgba(8, 47, 73, 0.18),
+          0 0 0 1px rgba(255, 255, 255, 0.88) inset !important;
+      }
+
+      body.theme-blue-light .hero-text .hero-actions .btn-primary:not(.whatsapp-link):hover {
+        background: #eaf6ff !important;
+        color: #082f49 !important;
+        border-color: rgba(125, 211, 252, 0.85) !important;
+      }
+
+      body.theme-blue-light .hero-text .hero-actions .whatsapp-link {
+        background: linear-gradient(135deg, #047857 0%, #10b981 100%) !important;
+        border: 1px solid rgba(134, 239, 172, 0.42) !important;
+        color: #ffffff !important;
+        box-shadow:
+          0 20px 48px rgba(4, 120, 87, 0.34),
+          0 0 0 1px rgba(255, 255, 255, 0.18) inset !important;
+      }
+
+      body.theme-blue-light .hero-text .hero-actions .whatsapp-link:hover {
+        background: linear-gradient(135deg, #065f46 0%, #047857 100%) !important;
+        color: #ffffff !important;
+      }
+
       @media (max-width: 620px) {
         body.theme-blue-light .statement-header {
           padding: 20px 22px 22px !important;
@@ -4031,9 +4061,9 @@
             <button class="hero-pill" type="button" data-hero-benefit="tax" aria-controls="hero-benefit-panel" aria-expanded="false">Deducible de impuestos</button>
           </div>
           <div class="hero-benefit-panel" id="hero-benefit-panel" role="status" aria-live="polite" hidden></div>
-          <h1>Casi nadie sabe lo que va a recibir cuando se retire.</h1>
+          <h1>Construye un patrimonio que te dé libertad cuando más lo necesites.</h1>
           <p class="lead">
-            Ya seas empleado, dueño de negocio o emprendedor, esta es la estrategia para no tener que trabajar por obligación el resto de tu vida cuando llegues a los 65. Construye un patrimonio robusto y una renta vitalicia garantizada de por vida.
+            Un plan bien estructurado puede ayudarte a convertir años de ahorro constante en patrimonio, libertad y tranquilidad financiera.
           </p>
           <div class="hero-actions">
             <a class="btn btn-primary btn-large" href="#calculadora">Calcular mi retiro</a>
@@ -4301,7 +4331,7 @@
       </section>
     </div>
 
-    <script src="script-azul-claro.js?v=26" defer></script>
+    <script src="script-azul-claro.js?v=27" defer></script>
     <script>
       (function () {
         document.body.classList.add("landing-enter");
