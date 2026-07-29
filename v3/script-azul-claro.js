@@ -609,7 +609,7 @@ function renderRetirementResult() {
       <div class="empty-result">
         <div>
           <strong>Ingresa tu edad y ahorro mensual para ver el escenario.</strong>
-          <p>Con esos dos datos la calculadora muestra cuánto podrías tener a los 65.</p>
+          <p>Con esos dos datos la calculadora muestra tu proyección hacia el retiro.</p>
         </div>
       </div>
     `;
@@ -622,7 +622,6 @@ function renderRetirementResult() {
   const aforeFinal = aforeProjection[aforeProjection.length - 1];
   const totalContributed = final.contributed;
   const growth = Math.max(0, final.capital - totalContributed);
-  const years = Math.max(0, 65 - age);
 
   const pprPension = calculateMonthlyPension(final.capital, PPR_ANNUITY_RATE);
   const aforePension = calculateMonthlyPension(aforeFinal.capital, AFORE_ANNUITY_RATE);
@@ -632,8 +631,8 @@ function renderRetirementResult() {
     <article class="statement-card">
       <header class="statement-header">
         <div>
-          <span class="statement-kicker">Estado de cuenta futuro</span>
-          <h3>Tu escenario a los 65</h3>
+          <span class="statement-kicker">Proyección patrimonial</span>
+          <h3>Tu proyección hacia el retiro</h3>
         </div>
       </header>
 
@@ -644,11 +643,11 @@ function renderRetirementResult() {
         </div>
         <div class="scenario-numbers">
           <div class="scenario-col">
-            <span class="scenario-label">Capital acumulado estimado (MXN)</span>
+            <span class="scenario-label">Capital estimado</span>
             <strong class="scenario-capital-num">${formatMdp(final.capital)}</strong>
           </div>
           <div class="scenario-col">
-            <span class="scenario-label">Renta vitalicia garantizada (MXN)</span>
+            <span class="scenario-label">Renta vitalicia</span>
             <strong class="scenario-pension-num">${formatMoney(pprPension)}<small>/mes</small></strong>
             <em class="scenario-note">De por vida (incluso si vives +100 años)</em>
           </div>
@@ -658,20 +657,39 @@ function renderRetirementResult() {
       <!-- AFORE / Ahorro tradicional referencia -->
       <div class="scenario-block scenario-block-afore">
         <div class="scenario-tag-row">
-          <span class="scenario-tag scenario-tag-afore">Ahorro por tu cuenta / AFORE</span>
-          <p class="scenario-sub">Sin estrategia fiscal ni portafolio indexado</p>
+          <span class="scenario-tag scenario-tag-afore">Ahorro / AFORE</span>
+          <p class="scenario-sub">Sin estrategia fiscal ni portafolio global</p>
         </div>
         <div class="scenario-numbers">
           <div class="scenario-col">
-            <span class="scenario-label">Capital acumulado estimado (MXN)</span>
+            <span class="scenario-label">Capital estimado</span>
             <strong class="scenario-capital-num scenario-capital-afore">${formatMdp(aforeFinal.capital)}</strong>
           </div>
           <div class="scenario-col">
-            <span class="scenario-label">Renta mensual aprox. (MXN)</span>
+            <span class="scenario-label">Renta aprox.</span>
             <strong class="scenario-pension-num scenario-pension-afore">${formatMoney(aforePension)}<small>/mes</small></strong>
             <em class="scenario-note">Se agota con el tiempo</em>
           </div>
         </div>
+      </div>
+
+      <div class="statement-chart-wrap">
+        <div class="chart-legend" aria-hidden="true">
+          <span class="legend-item legend-item-plan"><i class="legend-plan"></i>PPR Allianz</span>
+          <span class="legend-item legend-item-afore"><i class="legend-afore"></i>Ahorro / AFORE</span>
+        </div>
+        <div class="statement-chart" data-interactive-chart>
+          ${renderChart(projection, aforeProjection)}
+        </div>
+        <div class="chart-year-control" data-chart-year-control>
+          <div>
+            <span>Explora año por año</span>
+            <strong data-chart-selected-age>65 años</strong>
+          </div>
+          <input class="chart-year-range" type="range" min="${Math.round(age)}" max="65" step="1" value="65" data-chart-range aria-label="Seleccionar edad en la gráfica" />
+        </div>
+        <div class="chart-year-summary" data-chart-summary aria-live="polite"></div>
+        <p class="chart-footnote">Montos en pesos mexicanos (MXN). MDP = millones de pesos.</p>
       </div>
 
       ${capitalDiff > 0 ? `
@@ -683,7 +701,7 @@ function renderRetirementResult() {
 
       <div class="statement-ledger" aria-label="Resumen del cálculo">
         <div>
-          <span>Lo que ahorrarías</span>
+          <span>Lo que aportarías</span>
           <strong>${formatMoney(totalContributed)}</strong>
         </div>
         <div>
@@ -691,20 +709,9 @@ function renderRetirementResult() {
           <strong>${formatMoney(growth)}</strong>
         </div>
         <div>
-          <span>Horizonte</span>
-          <strong>${years} años</strong>
+          <span>Edad de referencia</span>
+          <strong>65 años</strong>
         </div>
-      </div>
-
-      <div class="statement-chart-wrap">
-        <div class="chart-legend" aria-hidden="true">
-          <span class="legend-item legend-item-plan"><i class="legend-plan"></i>PPR Allianz</span>
-          <span class="legend-item legend-item-afore"><i class="legend-afore"></i>Ahorro por tu cuenta / AFORE</span>
-        </div>
-        <div class="statement-chart">
-          ${renderChart(projection, aforeProjection)}
-        </div>
-        <p class="chart-footnote">Todas las cantidades están en pesos mexicanos (MXN). MDP significa millones de pesos mexicanos.</p>
       </div>
 
       <p class="statement-disclaimer">
@@ -712,6 +719,107 @@ function renderRetirementResult() {
       </p>
     </article>
   `;
+
+  setupInteractiveChart(result, projection, aforeProjection);
+}
+
+function setupInteractiveChart(root, projection, aforeProjection) {
+  const chart = root.querySelector("[data-interactive-chart]");
+  const svg = chart?.querySelector("svg");
+  const range = root.querySelector("[data-chart-range]");
+  const selectedAge = root.querySelector("[data-chart-selected-age]");
+  const summary = root.querySelector("[data-chart-summary]");
+  const cursor = svg?.querySelector("[data-chart-cursor]");
+  const cursorLine = svg?.querySelector("[data-chart-cursor-line]");
+  const cursorMain = svg?.querySelector("[data-chart-cursor-main]");
+  const cursorAfore = svg?.querySelector("[data-chart-cursor-afore]");
+  if (!chart || !svg || !range || !selectedAge || !summary || !projection.length) return;
+
+  const plotLeft = Number(svg.dataset.plotLeft);
+  const plotRight = Number(svg.dataset.plotRight);
+  const plotTop = Number(svg.dataset.plotTop);
+  const plotBottom = Number(svg.dataset.plotBottom);
+  const maxValue = Number(svg.dataset.maxValue);
+  const plotWidth = Math.max(1, plotRight - plotLeft);
+  const plotHeight = Math.max(1, plotBottom - plotTop);
+
+  const y = (value) => plotTop + plotHeight - (value / maxValue) * plotHeight;
+  const x = (index) => plotLeft + (index / Math.max(1, projection.length - 1)) * plotWidth;
+
+  const getIndexByAge = (age) => {
+    const target = Number(age);
+    const exactIndex = projection.findIndex((row) => Math.round(row.age) === Math.round(target));
+    if (exactIndex !== -1) return exactIndex;
+    return projection.reduce((closest, row, index) => {
+      const currentDistance = Math.abs(Math.round(row.age) - target);
+      const closestDistance = Math.abs(Math.round(projection[closest].age) - target);
+      return currentDistance < closestDistance ? index : closest;
+    }, 0);
+  };
+
+  const selectIndex = (index) => {
+    const safeIndex = Math.max(0, Math.min(projection.length - 1, index));
+    const ppr = projection[safeIndex];
+    const afore = aforeProjection[Math.min(safeIndex, Math.max(0, aforeProjection.length - 1))] || { capital: 0 };
+    const age = Math.round(ppr.age);
+    const cursorX = x(safeIndex);
+    const pprY = y(ppr.capital);
+    const aforeY = y(afore.capital);
+    const difference = Math.max(0, ppr.capital - afore.capital);
+
+    range.value = String(age);
+    selectedAge.textContent = `${age} años`;
+    summary.innerHTML = `
+      <div>
+        <span>PPR Allianz</span>
+        <strong>${formatChartCapital(ppr.capital)}</strong>
+      </div>
+      <div>
+        <span>Ahorro / AFORE</span>
+        <strong>${formatChartCapital(afore.capital)}</strong>
+      </div>
+      <div>
+        <span>Diferencia</span>
+        <strong>+${formatChartCapital(difference)}</strong>
+      </div>
+    `;
+
+    if (cursor && cursorLine && cursorMain) {
+      cursor.hidden = false;
+      cursorLine.setAttribute("x1", cursorX);
+      cursorLine.setAttribute("x2", cursorX);
+      cursorLine.setAttribute("y1", plotTop);
+      cursorLine.setAttribute("y2", plotBottom);
+      cursorMain.setAttribute("cx", cursorX);
+      cursorMain.setAttribute("cy", pprY);
+      if (cursorAfore) {
+        cursorAfore.setAttribute("cx", cursorX);
+        cursorAfore.setAttribute("cy", aforeY);
+      }
+    }
+  };
+
+  const selectFromPointer = (event) => {
+    const rect = svg.getBoundingClientRect();
+    const viewBox = svg.viewBox.baseVal;
+    const relativeX = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const svgX = viewBox.x + relativeX * viewBox.width;
+    const progress = Math.max(0, Math.min(1, (svgX - plotLeft) / plotWidth));
+    selectIndex(Math.round(progress * (projection.length - 1)));
+  };
+
+  range.addEventListener("input", () => selectIndex(getIndexByAge(range.value)));
+  chart.addEventListener("pointerdown", (event) => {
+    selectFromPointer(event);
+    chart.setPointerCapture?.(event.pointerId);
+  });
+  chart.addEventListener("pointermove", (event) => {
+    if (event.pointerType === "mouse" || event.buttons) {
+      selectFromPointer(event);
+    }
+  });
+
+  selectIndex(projection.length - 1);
 }
 
 // ── SAT result ─────────────────────────────────────────────────────────────
@@ -734,7 +842,7 @@ function renderSatResult() {
         <span class="sat-stamp">Pendiente</span>
       </div>
       <strong>${formatMoney(0)}</strong>
-      <p>Ingresa tu sueldo mensual bruto para estimar cuánto podría devolverte el SAT.</p>
+      <p>Ingresa tu ingreso mensual bruto para estimar tu posible devolución.</p>
     `;
     return;
   }
@@ -743,14 +851,14 @@ function renderSatResult() {
   satResult.classList.remove("warning");
   satResult.innerHTML = `
     <div class="sat-smart-top">
-      <span>Estimación fiscal</span>
+      <span>Devolución estimada</span>
       <span class="sat-stamp">Art. 151</span>
     </div>
     <p>Podrías recuperar aproximadamente</p>
     <strong>${formatMoney(refund.refund)}</strong>
     <ul class="sat-breakdown">
-      <li><span>Aportación anual usada</span><strong>${formatMoney(annualSaving)}</strong></li>
-      <li><span>Tope deducible aplicado</span><strong>${formatMoney(refund.baseDeductible)}</strong></li>
+      <li><span>Aportación anual</span><strong>${formatMoney(annualSaving)}</strong></li>
+      <li><span>Base deducible</span><strong>${formatMoney(refund.baseDeductible)}</strong></li>
     </ul>
   `;
 }
@@ -853,11 +961,14 @@ function renderChart(data, aforeData = []) {
   const finalIndex = data.length - 1;
   const finalPoint = data[finalIndex];
   const aforeFinalIndex = Math.max(0, aforeData.length - 1);
-  const aforeFinalPoint = aforeData[aforeFinalIndex];
+  const aforeFinalPoint = aforeData[aforeFinalIndex] || { capital: 0 };
   const endpointRadius = isCompact ? 7 : 8;
+  const cursorX = x(finalIndex);
+  const cursorMainY = y(finalPoint.capital);
+  const cursorAforeY = y(aforeFinalPoint.capital);
 
   return `
-    <svg viewBox="0 0 ${width} ${height}" style="overflow: visible;" role="img" aria-label="Proyección estimada de retiro en pesos mexicanos. MDP significa millones de pesos mexicanos.">
+    <svg viewBox="0 0 ${width} ${height}" style="overflow: visible;" role="img" aria-label="Proyección estimada de retiro en pesos mexicanos. MDP significa millones de pesos mexicanos." data-plot-left="${margin.left}" data-plot-right="${margin.left + plotWidth}" data-plot-top="${margin.top}" data-plot-bottom="${margin.top + plotHeight}" data-max-value="${maxValue}">
       ${horizontalGrid}
       ${verticalGrid}
       <polygon class="chart-area" points="${areaPoints}" />
@@ -866,6 +977,11 @@ function renderChart(data, aforeData = []) {
       ${aforeData.length ? `<circle class="chart-endpoint-afore" cx="${x(Math.min(aforeFinalIndex, data.length - 1))}" cy="${y(aforeFinalPoint.capital)}" r="${isCompact ? 4 : 5}" />` : ""}
       <circle class="chart-endpoint-halo" cx="${x(finalIndex)}" cy="${y(finalPoint.capital)}" r="${endpointRadius + 8}" />
       <circle class="chart-endpoint" cx="${x(finalIndex)}" cy="${y(finalPoint.capital)}" r="${endpointRadius}" />
+      <g class="chart-cursor" data-chart-cursor>
+        <line class="chart-cursor-line" data-chart-cursor-line x1="${cursorX}" y1="${margin.top}" x2="${cursorX}" y2="${margin.top + plotHeight}" />
+        ${aforeData.length ? `<circle class="chart-cursor-dot chart-cursor-dot-afore" data-chart-cursor-afore cx="${cursorX}" cy="${cursorAforeY}" r="${isCompact ? 5 : 6}" />` : ""}
+        <circle class="chart-cursor-dot chart-cursor-dot-main" data-chart-cursor-main cx="${cursorX}" cy="${cursorMainY}" r="${isCompact ? 6 : 7}" />
+      </g>
     </svg>
     <div class="chart-age-axis" aria-hidden="true">${ageAxis}</div>
   `;
@@ -930,6 +1046,10 @@ function setHelp(element, text, tone) {
 
 function formatMoney(value) {
   return MONEY.format(Math.round(value));
+}
+
+function formatChartCapital(value) {
+  return value >= 1000000 ? formatMdp(value) : formatMoney(value);
 }
 
 function formatMdp(value) {
