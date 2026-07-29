@@ -751,10 +751,6 @@ function setupInteractiveChart(root, projection, aforeProjection) {
 
   const y = (value) => plotTop + plotHeight - (value / maxValue) * plotHeight;
   const x = (index) => plotLeft + (index / Math.max(1, projection.length - 1)) * plotWidth;
-  let activePointerId = null;
-  let pointerStartX = 0;
-  let pointerStartY = 0;
-  let isHorizontalDrag = false;
 
   const revealChartPanel = () => {
     legend.classList.add("is-visible");
@@ -832,55 +828,8 @@ function setupInteractiveChart(root, projection, aforeProjection) {
     selectIndex(Math.round(progress * (projection.length - 1)), revealPanel);
   };
 
-  const clearPointer = (event) => {
-    if (activePointerId !== event.pointerId) return;
-    activePointerId = null;
-    isHorizontalDrag = false;
-    if (event.pointerType === "mouse") {
-      chart.releasePointerCapture?.(event.pointerId);
-    }
-  };
-
   range.addEventListener("input", () => selectIndex(getIndexByAge(range.value), true));
-  chart.addEventListener("pointerdown", (event) => {
-    if (event.pointerType === "mouse" && event.button !== 0) return;
-    activePointerId = event.pointerId;
-    pointerStartX = event.clientX;
-    pointerStartY = event.clientY;
-    isHorizontalDrag = false;
-    selectFromPointer(event, true);
-    if (event.pointerType === "mouse") {
-      chart.setPointerCapture?.(event.pointerId);
-    }
-  });
-  chart.addEventListener("pointermove", (event) => {
-    if (activePointerId !== event.pointerId) return;
-
-    if (event.pointerType === "mouse") {
-      if (event.buttons) selectFromPointer(event, true);
-      return;
-    }
-
-    const deltaX = event.clientX - pointerStartX;
-    const deltaY = event.clientY - pointerStartY;
-    const absX = Math.abs(deltaX);
-    const absY = Math.abs(deltaY);
-
-    if (!isHorizontalDrag) {
-      if (absX < 8 && absY < 8) return;
-      if (absY > absX) {
-        clearPointer(event);
-        return;
-      }
-      isHorizontalDrag = true;
-    }
-
-    event.preventDefault();
-    selectFromPointer(event, true);
-  }, { passive: false });
-  chart.addEventListener("pointerup", clearPointer);
-  chart.addEventListener("pointercancel", clearPointer);
-  chart.addEventListener("lostpointercapture", clearPointer);
+  chart.addEventListener("click", (event) => selectFromPointer(event, true));
 
   legend.setAttribute("aria-hidden", "true");
   control.setAttribute("aria-hidden", "true");
