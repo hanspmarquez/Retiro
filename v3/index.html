@@ -3934,6 +3934,33 @@
         border-radius: 12px !important;
       }
 
+      body.theme-blue-light .chart-legend:not(.is-visible),
+      body.theme-blue-light .chart-year-control:not(.is-visible),
+      body.theme-blue-light .chart-year-summary:not(.is-visible) {
+        display: none !important;
+      }
+
+      body.theme-blue-light .chart-cursor:not(.is-visible) {
+        display: none !important;
+      }
+
+      body.theme-blue-light .chart-legend.is-visible,
+      body.theme-blue-light .chart-year-control.is-visible,
+      body.theme-blue-light .chart-year-summary.is-visible {
+        animation: chartPanelIn 240ms ease both !important;
+      }
+
+      @keyframes chartPanelIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       body.theme-blue-light .scenario-diff {
         margin: 12px 24px 0 !important;
         padding: 12px 14px !important;
@@ -4172,10 +4199,9 @@
         </div>
 
         <div class="session-summary reveal" aria-label="Resumen de la asesoría patrimonial">
-          <h3>En la sesión aterrizamos tu estrategia desde tres ángulos:</h3>
-          <ul class="session-points session-points-three">
+          <h3>En la sesión aterrizamos tu estrategia desde dos ángulos:</h3>
+          <ul class="session-points">
             <li><p><strong>Tu meta patrimonial:</strong> revisamos lo que ya tienes, lo que puedes fortalecer y hacia dónde quieres llegar.</p></li>
-            <li><p><strong>Compra de activos:</strong> qué activos pueden ayudarte a construir patrimonio.</p></li>
             <li><p><strong>PPR y estrategia fiscal:</strong> cuánto ahorrar, qué deducir y cómo proyectarlo.</p></li>
           </ul>
           <p class="session-note">
@@ -4275,7 +4301,7 @@
       </section>
     </div>
 
-    <script src="script-azul-claro.js?v=21" defer></script>
+    <script src="script-azul-claro.js?v=25" defer></script>
     <script>
       (function () {
         document.body.classList.add("landing-enter");

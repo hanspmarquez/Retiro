@@ -460,7 +460,11 @@ function setupCalculator() {
   });
 
   let resizeTimer;
+  let lastViewportWidth = window.innerWidth;
   window.addEventListener("resize", () => {
+    const nextViewportWidth = window.innerWidth;
+    if (Math.abs(nextViewportWidth - lastViewportWidth) < 16) return;
+    lastViewportWidth = nextViewportWidth;
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(renderRetirementResult, 160);
   });
@@ -674,7 +678,7 @@ function renderRetirementResult() {
       </div>
 
       <div class="statement-chart-wrap">
-        <div class="chart-legend" aria-hidden="true">
+        <div class="chart-legend" data-chart-legend aria-hidden="true">
           <span class="legend-item legend-item-plan"><i class="legend-plan"></i>PPR Allianz</span>
           <span class="legend-item legend-item-afore"><i class="legend-afore"></i>Ahorro / AFORE</span>
         </div>
@@ -688,8 +692,8 @@ function renderRetirementResult() {
           </div>
           <input class="chart-year-range" type="range" min="${Math.round(age)}" max="65" step="1" value="65" data-chart-range aria-label="Seleccionar edad en la gráfica" />
         </div>
-        <div class="chart-year-summary" data-chart-summary aria-live="polite"></div>
-        <p class="chart-footnote">Montos en pesos mexicanos (MXN). MDP = millones de pesos.</p>
+        <div class="chart-year-summary" data-chart-summary aria-live="polite" aria-hidden="true"></div>
+        <p class="chart-footnote">Toca la gráfica para explorar por año. Montos en pesos mexicanos (MXN). MDP = millones de pesos.</p>
       </div>
 
       ${capitalDiff > 0 ? `
@@ -726,6 +730,8 @@ function renderRetirementResult() {
 function setupInteractiveChart(root, projection, aforeProjection) {
   const chart = root.querySelector("[data-interactive-chart]");
   const svg = chart?.querySelector("svg");
+  const legend = root.querySelector("[data-chart-legend]");
+  const control = root.querySelector("[data-chart-year-control]");
   const range = root.querySelector("[data-chart-range]");
   const selectedAge = root.querySelector("[data-chart-selected-age]");
   const summary = root.querySelector("[data-chart-summary]");
@@ -733,7 +739,7 @@ function setupInteractiveChart(root, projection, aforeProjection) {
   const cursorLine = svg?.querySelector("[data-chart-cursor-line]");
   const cursorMain = svg?.querySelector("[data-chart-cursor-main]");
   const cursorAfore = svg?.querySelector("[data-chart-cursor-afore]");
-  if (!chart || !svg || !range || !selectedAge || !summary || !projection.length) return;
+  if (!chart || !svg || !legend || !control || !range || !selectedAge || !summary || !projection.length) return;
 
   const plotLeft = Number(svg.dataset.plotLeft);
   const plotRight = Number(svg.dataset.plotRight);
@@ -745,6 +751,19 @@ function setupInteractiveChart(root, projection, aforeProjection) {
 
   const y = (value) => plotTop + plotHeight - (value / maxValue) * plotHeight;
   const x = (index) => plotLeft + (index / Math.max(1, projection.length - 1)) * plotWidth;
+  let activePointerId = null;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let isHorizontalDrag = false;
+
+  const revealChartPanel = () => {
+    legend.classList.add("is-visible");
+    legend.setAttribute("aria-hidden", "false");
+    control.classList.add("is-visible");
+    control.setAttribute("aria-hidden", "false");
+    summary.classList.add("is-visible");
+    summary.setAttribute("aria-hidden", "false");
+  };
 
   const getIndexByAge = (age) => {
     const target = Number(age);
@@ -757,7 +776,7 @@ function setupInteractiveChart(root, projection, aforeProjection) {
     }, 0);
   };
 
-  const selectIndex = (index) => {
+  const selectIndex = (index, revealPanel = true) => {
     const safeIndex = Math.max(0, Math.min(projection.length - 1, index));
     const ppr = projection[safeIndex];
     const afore = aforeProjection[Math.min(safeIndex, Math.max(0, aforeProjection.length - 1))] || { capital: 0 };
@@ -785,7 +804,8 @@ function setupInteractiveChart(root, projection, aforeProjection) {
     `;
 
     if (cursor && cursorLine && cursorMain) {
-      cursor.hidden = false;
+      cursor.hidden = !revealPanel;
+      cursor.classList.toggle("is-visible", revealPanel);
       cursorLine.setAttribute("x1", cursorX);
       cursorLine.setAttribute("x2", cursorX);
       cursorLine.setAttribute("y1", plotTop);
@@ -797,29 +817,74 @@ function setupInteractiveChart(root, projection, aforeProjection) {
         cursorAfore.setAttribute("cy", aforeY);
       }
     }
+
+    if (revealPanel) {
+      revealChartPanel();
+    }
   };
 
-  const selectFromPointer = (event) => {
+  const selectFromPointer = (event, revealPanel = true) => {
     const rect = svg.getBoundingClientRect();
     const viewBox = svg.viewBox.baseVal;
     const relativeX = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
     const svgX = viewBox.x + relativeX * viewBox.width;
     const progress = Math.max(0, Math.min(1, (svgX - plotLeft) / plotWidth));
-    selectIndex(Math.round(progress * (projection.length - 1)));
+    selectIndex(Math.round(progress * (projection.length - 1)), revealPanel);
   };
 
-  range.addEventListener("input", () => selectIndex(getIndexByAge(range.value)));
+  const clearPointer = (event) => {
+    if (activePointerId !== event.pointerId) return;
+    activePointerId = null;
+    isHorizontalDrag = false;
+    if (event.pointerType === "mouse") {
+      chart.releasePointerCapture?.(event.pointerId);
+    }
+  };
+
+  range.addEventListener("input", () => selectIndex(getIndexByAge(range.value), true));
   chart.addEventListener("pointerdown", (event) => {
-    selectFromPointer(event);
-    chart.setPointerCapture?.(event.pointerId);
-  });
-  chart.addEventListener("pointermove", (event) => {
-    if (event.pointerType === "mouse" || event.buttons) {
-      selectFromPointer(event);
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    activePointerId = event.pointerId;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    isHorizontalDrag = false;
+    selectFromPointer(event, true);
+    if (event.pointerType === "mouse") {
+      chart.setPointerCapture?.(event.pointerId);
     }
   });
+  chart.addEventListener("pointermove", (event) => {
+    if (activePointerId !== event.pointerId) return;
 
-  selectIndex(projection.length - 1);
+    if (event.pointerType === "mouse") {
+      if (event.buttons) selectFromPointer(event, true);
+      return;
+    }
+
+    const deltaX = event.clientX - pointerStartX;
+    const deltaY = event.clientY - pointerStartY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (!isHorizontalDrag) {
+      if (absX < 8 && absY < 8) return;
+      if (absY > absX) {
+        clearPointer(event);
+        return;
+      }
+      isHorizontalDrag = true;
+    }
+
+    event.preventDefault();
+    selectFromPointer(event, true);
+  }, { passive: false });
+  chart.addEventListener("pointerup", clearPointer);
+  chart.addEventListener("pointercancel", clearPointer);
+  chart.addEventListener("lostpointercapture", clearPointer);
+
+  legend.setAttribute("aria-hidden", "true");
+  control.setAttribute("aria-hidden", "true");
+  selectIndex(projection.length - 1, false);
 }
 
 // ── SAT result ─────────────────────────────────────────────────────────────
