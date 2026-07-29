@@ -37,6 +37,11 @@
       fbq("track", "PageView");
     </script>
     <!-- End Meta Pixel Code -->
+    <script>
+      if ("scrollRestoration" in history && !window.location.hash) {
+        history.scrollRestoration = "manual";
+      }
+    </script>
     <style>
       /* ─── Tipografía ──────────────────────────────────── */
       :root,
@@ -4008,6 +4013,25 @@
         color: #ffffff !important;
       }
 
+      /* SAT: números con la misma tipografía financiera */
+      body.theme-blue-light .sat-result > strong,
+      body.theme-blue-light .sat-breakdown strong,
+      body.theme-blue-light .sat-form-grid input {
+        font-family: var(--font-sans) !important;
+        font-variant-numeric: tabular-nums !important;
+        letter-spacing: 0 !important;
+      }
+
+      body.theme-blue-light .sat-result > strong {
+        font-weight: 900 !important;
+        line-height: 0.98 !important;
+      }
+
+      body.theme-blue-light .sat-breakdown strong,
+      body.theme-blue-light .sat-form-grid input {
+        font-weight: 900 !important;
+      }
+
       @media (max-width: 620px) {
         body.theme-blue-light .statement-header {
           padding: 20px 22px 22px !important;
@@ -4331,12 +4355,22 @@
       </section>
     </div>
 
-    <script src="script-azul-claro.js?v=27" defer></script>
+    <script src="script-azul-claro.js?v=28" defer></script>
     <script>
       (function () {
+        const scrollToTop = () => {
+          if (window.location.hash) return;
+          window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        };
+
+        scrollToTop();
+        window.addEventListener("pageshow", scrollToTop);
+
         document.body.classList.add("landing-enter");
         requestAnimationFrame(() => {
+          scrollToTop();
           requestAnimationFrame(() => {
+            scrollToTop();
             document.body.classList.remove("landing-enter");
           });
         });

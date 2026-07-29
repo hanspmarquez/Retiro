@@ -693,7 +693,7 @@ function renderRetirementResult() {
           <input class="chart-year-range" type="range" min="${Math.round(age)}" max="65" step="1" value="65" data-chart-range aria-label="Seleccionar edad en la gráfica" />
         </div>
         <div class="chart-year-summary" data-chart-summary aria-live="polite" aria-hidden="true"></div>
-        <p class="chart-footnote">Toca la gráfica para explorar por año. Montos en pesos mexicanos (MXN). MDP = millones de pesos.</p>
+        <p class="chart-footnote">Toca la gráfica y usa el deslizador para explorar por año. Montos en pesos mexicanos (MXN). MDP = millones de pesos.</p>
       </div>
 
       ${capitalDiff > 0 ? `
@@ -751,6 +751,7 @@ function setupInteractiveChart(root, projection, aforeProjection) {
 
   const y = (value) => plotTop + plotHeight - (value / maxValue) * plotHeight;
   const x = (index) => plotLeft + (index / Math.max(1, projection.length - 1)) * plotWidth;
+  const canDragChart = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   const revealChartPanel = () => {
     legend.classList.add("is-visible");
@@ -879,6 +880,7 @@ function setupInteractiveChart(root, projection, aforeProjection) {
 
   range.addEventListener("input", () => selectIndex(getIndexByAge(range.value), true));
   chart.addEventListener("pointerdown", (event) => {
+    if (!canDragChart && event.pointerType !== "mouse") return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     activePointerId = event.pointerId;
     pointerStartX = event.clientX;
@@ -892,6 +894,7 @@ function setupInteractiveChart(root, projection, aforeProjection) {
   });
 
   chart.addEventListener("pointermove", (event) => {
+    if (!canDragChart && event.pointerType !== "mouse") return;
     if (activePointerId !== event.pointerId) return;
 
     if (gestureMode === "pending") {
@@ -918,6 +921,7 @@ function setupInteractiveChart(root, projection, aforeProjection) {
   }, { passive: false });
 
   chart.addEventListener("pointerup", (event) => {
+    if (!canDragChart && event.pointerType !== "mouse") return;
     if (activePointerId !== event.pointerId) return;
     if (gestureMode === "pending") {
       selectFromPointer(event, true);
@@ -927,8 +931,9 @@ function setupInteractiveChart(root, projection, aforeProjection) {
 
   chart.addEventListener("pointercancel", clearPointer);
   chart.addEventListener("click", (event) => {
-    if (event.pointerType) return;
-    selectFromPointer(event, true);
+    revealChartPanel();
+    cursor?.classList.add("is-visible");
+    if (cursor) cursor.hidden = false;
   });
 
   legend.setAttribute("aria-hidden", "true");
