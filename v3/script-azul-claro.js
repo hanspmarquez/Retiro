@@ -8,15 +8,37 @@ if (typeof document !== "undefined") {
 const notes = [
   {
     number: "01",
-    title: "No necesitas sacrificar tu estilo de vida para empezar.",
-    text: "Muchos creen que para construir un buen retiro hay que aportar sumas enormes. La realidad es que empezar con un monto cómodo que tú controlas, aprovechando los rendimientos y la devolución de impuestos, genera un patrimonio mucho más grande que intentar recuperar el tiempo después.",
+    title: "No necesitas empezar con una cantidad enorme.",
+    text: "Puedes iniciar con un monto cómodo y ajustarlo con el tiempo. Lo importante es que tu ahorro empiece a trabajar cuanto antes.",
   },
   {
     number: "02",
-    title: "No necesitas ser experto en finanzas.",
-    text: "Para eso estoy yo. Te acompaño personalmente desde el día uno y revisamos tu estrategia año con año. Tú te enfocas en tu negocio o carrera, tu capital crece con la solidez y el respaldo de Allianz, y yo me aseguro de que siempre esté en el camino correcto.",
+    title: "No tienes que resolverlo solo.",
+    text: "Te acompaño a definir, revisar y ajustar tu estrategia con el respaldo de Allianz, sin que tengas que volverte experto en inversiones.",
   },
 ];
+
+const heroBenefits = {
+  minimum: {
+    kicker: "Monto mínimo",
+    title: "Puedes empezar desde $2,000 al mes",
+    text: "Es el monto mínimo para abrir tu plan de retiro. Puedes automatizarlo, empezar con una cantidad cómoda y aumentar tu ahorro cuando tu ingreso crezca.",
+    details: ["Entrada accesible", "Ahorro mensual", "Puedes ajustar tu estrategia"],
+  },
+  flexible: {
+    kicker: "Flexibilidad real",
+    title: "Pausas, ajustes y acceso parcial",
+    text: "Puedes pausar y retomar aportaciones sin penalización del plan. A partir de 18 meses de ahorro, también puedes disponer parcialmente de tu capital si lo necesitas.",
+    details: ["Sin castigo por pausar", "Acceso parcial desde 18 meses", "Tú mantienes el control"],
+  },
+  tax: {
+    kicker: "Beneficio fiscal",
+    title: "Parte de tu ahorro puede regresar cada año",
+    text: "Si ahorras $2,000 mensuales, podrías recuperar una parte vía devolución anual:",
+    details: ["$20 mil/mes: hasta $6 mil/año", "$30 mil/mes: hasta $9 mil/año", "$50 mil/mes: hasta $15 mil/año"],
+    note: "La devolución real depende de tu declaración, deducciones y topes legales del SAT.",
+  },
+};
 
 // ── Tax brackets (ISR 2024) ────────────────────────────────────────────────
 const taxBrackets = [
@@ -69,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCounters();
   setupTilt();
   renderNotes();
+  setupHeroBenefits();
   setupCalculator();
   setupCalendlyModal();
   setupWhatsAppTracking();
@@ -117,6 +140,66 @@ function setupWhatsAppTracking() {
         content_category: "WhatsApp",
       });
     });
+  });
+}
+
+function setupHeroBenefits() {
+  const panel = document.querySelector("#hero-benefit-panel");
+  const buttons = document.querySelectorAll("[data-hero-benefit]");
+  if (!panel || !buttons.length) return;
+
+  const closePanel = () => {
+    panel.hidden = true;
+    panel.classList.remove("is-visible");
+    buttons.forEach((button) => {
+      button.classList.remove("is-active");
+      button.setAttribute("aria-expanded", "false");
+    });
+  };
+
+  const renderBenefit = (key) => {
+    const benefit = heroBenefits[key];
+    if (!benefit) return;
+
+    buttons.forEach((button) => {
+      const isActive = button.dataset.heroBenefit === key;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-expanded", isActive ? "true" : "false");
+    });
+
+    const details = benefit.details
+      .map((detail) => `<li>${detail}</li>`)
+      .join("");
+
+    panel.innerHTML = `
+      <button class="hero-benefit-close" type="button" data-hero-benefit-close aria-label="Cerrar información">×</button>
+      <p class="hero-benefit-kicker">${benefit.kicker}</p>
+      <h3>${benefit.title}</h3>
+      <p>${benefit.text}</p>
+      <ul class="hero-benefit-details">${details}</ul>
+      ${benefit.note ? `<small class="hero-benefit-note">${benefit.note}</small>` : ""}
+    `;
+    panel.hidden = false;
+    panel.classList.remove("is-visible");
+    void panel.offsetWidth;
+    panel.classList.add("is-visible");
+  };
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.classList.contains("is-active") && !panel.hidden) {
+        closePanel();
+        return;
+      }
+
+      renderBenefit(button.dataset.heroBenefit);
+    });
+  });
+
+  panel.addEventListener("click", (event) => {
+    if (event.target.closest("[data-hero-benefit-close]")) {
+      closePanel();
+    }
   });
 }
 
